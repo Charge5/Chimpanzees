@@ -1,1 +1,8 @@
-Deep Learning 2024-2025-latex/example_paper.aux
+*.aux
+*.sty
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.bst
