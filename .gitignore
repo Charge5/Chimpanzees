@@ -1,8 +1,8 @@
 *.aux
-*.sty
 *.bbl
 *.blg
 *.log
 *.out
 *.synctex.gz
 *.bst
+*.DS_Store
