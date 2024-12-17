@@ -20,3 +20,17 @@ When done install the [requirements.txt](./requirements.txt) from the main direc
 ```
 pip install -r requirements.txt
 ```
+
+To run mammoth, first go to the following directory: 
+```
+cd ./Code/src/mammoth
+```
+
+Then run:
+```
+python utils/main.py --dataset seq_mnist \ 
+                      --model lwf \
+                      --lr 0.001 \
+                      --optimizer adam \
+                      --seed 42
+```
