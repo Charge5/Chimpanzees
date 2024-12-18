@@ -68,6 +68,8 @@ class SequentialMNIST(ContinualDataset):
         N_CLASSES (int): number of classes.
         SIZE (tuple): size of the images.
     """
+    # N_CLASSES_PER_TASK = 2
+    # N_TASKS = 5
 
     NAME = 'seq-mnist'
     SETTING = 'class-il'

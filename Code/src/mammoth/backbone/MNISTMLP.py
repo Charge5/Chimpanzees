@@ -38,6 +38,20 @@ class BaseMNISTMLP(MammothBackbone):
             self.fc2,
             nn.ReLU(),
         )
+        # self._features = nn.Sequential(
+        #     self.fc1,
+        #     nn.ReLU(),
+        #     self.fc2,
+        #     nn.ReLU(),
+        #     self.fc2,
+        #     nn.ReLU(),
+        #     self.fc2,
+        #     nn.ReLU(),
+        #     self.fc2,
+        #     nn.ReLU(),
+        #     self.fc2,
+        #     nn.ReLU(),
+        # )
         self.classifier = nn.Linear(hidden_size, self.output_size)
         self.net = nn.Sequential(self._features, self.classifier)
         self.reset_parameters()
