@@ -34,8 +34,23 @@ sys.path.append(mammoth_path + '/datasets')
 sys.path.append(mammoth_path + '/backbone')
 sys.path.append(mammoth_path + '/models')
 
+
+
+
 from utils import setup_logging
+import datetime
 setup_logging()
+
+def create_eth_dir():
+    current_time = datetime.datetime.now().isoformat()
+    current_time = current_time.replace(":", "_").split(".")[0]
+    eth_output_path = os.path.join(mammoth_path, "data/results/ETH")
+    os.mkdir(eth_output_path)
+    eth_output_path = os.path.join(eth_output_path, current_time)
+    logging.info(f"Creating {eth_output_path}")
+    os.mkdir(eth_output_path)
+    return eth_output_path
+
 
 if __name__ == '__main__':
     logging.info(f"Running Mammoth! on {socket.gethostname()}. (if you see this message more than once, you are probably importing something wrong)")
@@ -384,7 +399,15 @@ def main(args=None):
     except Exception:
         pass
 
-    train(model, dataset, args)
+    eth_output_path = create_eth_dir()
+
+    training_settings = open(os.path.join(eth_output_path,"training_settings.txt"),"w")
+    # training_settings.write(sys.argv[:])
+    for i in sys.argv[1:]:
+        training_settings.write(i)
+    training_settings.close()
+
+    train(model, dataset, args,eth_output_path)
 
 
 if __name__ == '__main__':

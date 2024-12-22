@@ -31,7 +31,6 @@ try:
 except ImportError:
     wandb = None
 
-
 def mask_classes(outputs: torch.Tensor, dataset: ContinualDataset, k: int) -> None:
     """
     Given the output tensor, the dataset at hand and the current task,
@@ -228,7 +227,7 @@ def train_single_epoch(model: ContinualModel,
 
 
 def train(model: ContinualModel, dataset: ContinualDataset,
-          args: Namespace) -> None:
+          args: Namespace,eth_path = None) -> None:
     """
     The training process, including evaluations and loggers.
 
@@ -424,6 +423,12 @@ def train(model: ContinualModel, dataset: ContinualDataset,
                     checkpoint_name = f'checkpoints/{args.ckpt_name}_joint.pt' if args.joint else f'checkpoints/{args.ckpt_name}_last.pt'
                 if checkpoint_name is not None:
                     torch.save(save_obj, checkpoint_name)
+
+            # Save the model (or do direct analysis)
+            model_file = os.path.join(eth_path,f"model_task_{t+1}.pt")
+            torch.save(model.state_dict(), model_file)
+
+            # f = open(model_file, "w")
 
         if args.validation:
             # Final evaluation on the real test set
