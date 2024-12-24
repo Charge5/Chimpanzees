@@ -2,8 +2,8 @@
 
 ## How to set it up ? 
 
-Make sure you have python 3.10 or later installed in your virtual environnement.
-That should be the case if your are using google colab. To check run the following in your environnement:
+Make sure you have python 3.10 or later installed in your virtual environment.
+That should be the case if your are using google colab. To check run the following in your environment:
 
 ```
 python --version
