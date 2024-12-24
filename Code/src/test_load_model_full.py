@@ -1,6 +1,12 @@
 import torch
 import sys
-sys.path.append('/Users/thomaszilliox/Documents/git_repos/Chimpanzees/Code/src/mammoth')
+import os
+
+root_dir = os.getcwd()
+print(root_dir
+      )
+mammoth_path = os.path.join(root_dir,'mammoth')
+sys.path.append(mammoth_path)
 import models
 
 
