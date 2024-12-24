@@ -45,7 +45,8 @@ def create_eth_dir():
     current_time = datetime.datetime.now().isoformat()
     current_time = current_time.replace(":", "_").split(".")[0]
     eth_output_path = os.path.join(mammoth_path, "data/results/ETH")
-    os.mkdir(eth_output_path)
+    if not os.path.exists(eth_output_path):
+        os.mkdir(eth_output_path)
     eth_output_path = os.path.join(eth_output_path, current_time)
     logging.info(f"Creating {eth_output_path}")
     os.mkdir(eth_output_path)
