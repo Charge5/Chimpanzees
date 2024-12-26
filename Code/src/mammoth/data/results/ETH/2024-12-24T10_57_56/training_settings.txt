@@ -1,0 +1,1 @@
+--datasetseq-mnist--backbonemnistmlp--modellwf--lr0.01--seed42
