@@ -35,3 +35,5 @@ tzdata==2024.2
 urllib3==2.2.3
 wcwidth==0.2.13
 matplotlib == 3.10.0
+scipy == 1.14.1
+quadprog == 0.1.13
