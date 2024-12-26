@@ -27,6 +27,7 @@ import datetime
 import uuid
 from argparse import ArgumentParser, Namespace
 import torch
+import csv
 
 mammoth_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(mammoth_path)
@@ -176,6 +177,8 @@ def parse_args():
     #   the backbone is optional as may be set by the dataset or the model. The dataset and model are required.
     add_initial_args(parser)
     args = parser.parse_known_args()[0]
+    parser.add_argument("--mlp_hidden_depth", type=int, required=False, help="Size of the input layer")
+
 
     if args.backbone is None:
         logging.warning('No backbone specified. Using default backbone (set by the dataset).')
@@ -251,6 +254,7 @@ def parse_args():
     args.conf_jobnum = str(uuid.uuid4())
     args.conf_timestamp = str(datetime.datetime.now())
     args.conf_host = socket.gethostname()
+
 
     # Add the current git commit hash to the arguments if available
     try:
@@ -409,6 +413,42 @@ def main(args=None):
     training_settings.close()
 
     train(model, dataset, args,eth_output_path)
+
+
+
+    def append_to_csv(file_path, data, headers=None):
+        # Check if the file exists
+        file_exists = os.path.exists(file_path)
+
+        # Open the file in append mode
+        with open(file_path, mode='a', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+
+            # Write headers only if the file does not exist and headers are provided
+            if not file_exists and headers:
+                writer.writerow(headers)
+
+            # Write the data
+            writer.writerow(data)
+
+    # Example usage
+    results_path =  os.path.join(mammoth_path, "data/results/ETH")
+    file_path = os.path.join(results_path,"results.csv")
+    # file_path = "example.csv"
+    import ast
+    logs_path = "/Users/thomaszilliox/Documents/git_repos/Chimpanzees/Code/src/mammoth/data/results/class-il/seq-mnist/lwf_mc/logs.pyd"
+    f = open(logs_path, "r")
+    results = f.readlines()
+    last_results = results[-1]
+    last_results = last_results.replace("np.float64(", "").replace(")", "").replace("device(type=", "")
+
+    # Convert the string to a dictionary
+    last_results = ast.literal_eval(last_results)
+
+    headers = ["Epochs","Learning Rate" ,"Depth", "Width","Mean"]
+    data = [args.n_epochs,args.lr, args.mlp_hidden_depth, args.mlp_hidden_size,last_results[f'accmean_task{5}']]
+
+    append_to_csv(file_path, data, headers=headers)
 
 
 if __name__ == '__main__':

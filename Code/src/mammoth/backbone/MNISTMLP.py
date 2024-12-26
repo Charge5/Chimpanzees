@@ -16,7 +16,7 @@ class BaseMNISTMLP(MammothBackbone):
     Designed for the MNIST dataset.
     """
 
-    def __init__(self, input_size: int, output_size: int, hidden_size=100) -> None:
+    def __init__(self, input_size: int, output_size: int, hidden_size=100,hidden_depth = 2) -> None:
         """
         Instantiates the layers of the network.
 
@@ -32,26 +32,24 @@ class BaseMNISTMLP(MammothBackbone):
         self.fc1 = nn.Linear(self.input_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
 
-        self._features = nn.Sequential(
-            self.fc1,
-            nn.ReLU(),
-            self.fc2,
-            nn.ReLU(),
-        )
         # self._features = nn.Sequential(
         #     self.fc1,
         #     nn.ReLU(),
         #     self.fc2,
         #     nn.ReLU(),
-        #     self.fc2,
-        #     nn.ReLU(),
-        #     self.fc2,
-        #     nn.ReLU(),
-        #     self.fc2,
-        #     nn.ReLU(),
-        #     self.fc2,
-        #     nn.ReLU(),
         # )
+        # Create a list of layers dynamically
+        num_layers = hidden_depth
+        layers = []
+        layers.append(nn.Linear(self.input_size, hidden_size))
+        layers.append(nn.ReLU())
+
+        for _ in range(num_layers - 1):
+            layers.append(nn.Linear(hidden_size, hidden_size))
+            layers.append(nn.ReLU())
+
+        self._features = nn.Sequential(*layers)
+
         self.classifier = nn.Linear(hidden_size, self.output_size)
         self.net = nn.Sequential(self._features, self.classifier)
         self.reset_parameters()
@@ -90,7 +88,9 @@ class BaseMNISTMLP(MammothBackbone):
 
 
 @register_backbone("mnistmlp")
-def mnistmlp(mlp_hidden_size: int = 100) -> BaseMNISTMLP:
+def mnistmlp(mlp_hidden_size: int = 100, mlp_hidden_depth: int = 5) -> BaseMNISTMLP:
+    if mlp_hidden_depth != 5:
+        logging.info(f"hidden depth is set to `{mlp_hidden_depth}` instead of the default `5`")
     if mlp_hidden_size != 100:
         logging.info(f"hidden size is set to `{mlp_hidden_size}` instead of the default `100`")
-    return BaseMNISTMLP(28 * 28, 10, hidden_size=mlp_hidden_size)
+    return BaseMNISTMLP(28 * 28, 10, hidden_size=mlp_hidden_size,hidden_depth = mlp_hidden_depth)

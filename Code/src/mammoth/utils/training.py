@@ -426,6 +426,7 @@ def train(model: ContinualModel, dataset: ContinualDataset,
 
             # Save the model (or do direct analysis)
             model_file = os.path.join(eth_path,f"model_task_{t+1}.pt")
+            # torch.save(model.state_dict(), model_file)
             torch.save(model, model_file)
 
             # f = open(model_file, "w")
