@@ -2,7 +2,6 @@ import torch
 import numpy as np
 from src.counting.exact_counting_utils import ActivationRegion, set_empty_activation_pattern, \
                                     embedding, compute_line_region_intersection, update_linear_maps
-
 def exact_count_2D(layers, images_plane, init_vertices):
     n_in = layers[0].weight.shape[1]
 
@@ -11,15 +10,13 @@ def exact_count_2D(layers, images_plane, init_vertices):
         activation_pattern=torch.empty((n_in, 1), dtype=torch.float32),
         linear_map=(torch.eye(n_in), torch.zeros(n_in, 1))
     )
-    cut_counter = 0
-    no_cut_counter = 0
 
     regions = [init_region]
     with torch.no_grad():
         for l in range(len(layers)-1):      # Iterate over hidden layers
             if isinstance(layers[l], torch.nn.ReLU):
                 continue
-            W = layers[l].weight            # TODO: Currently W, b requires grad. Faster if not?
+            W = layers[l].weight
             b = layers[l].bias
             n_neurons = W.shape[0]
             set_empty_activation_pattern(regions, n_neurons)
@@ -33,13 +30,20 @@ def exact_count_2D(layers, images_plane, init_vertices):
                     A, c = region.linear_map
                     vertices = region.convex_hull.points[region.convex_hull.vertices]
                     input = embedding(vertices.T, images_plane)
-                    #input = torch.tensor(vertices, dtype=torch.float32).T
                     preactivation = Wi @ (A @ input + c) + bi
                     sign = torch.sign(preactivation)
                     if torch.unique(sign).shape[0] > 1:     # Region is cut
-                        cut_counter += 1
                         intersection  = compute_line_region_intersection(region.convex_hull, line_coeffs=(Wi @ A, (Wi @ c).squeeze() + bi), images_plane=images_plane)
-                        if len(intersection) > 0:           # TODO: Necessary? Imo this is useless, the region IS cut.
+                        if len(intersection) == 1:          # Intersection is a single point
+                            if sign[0] == 1:                    # TODO: Find cleaner way to do this
+                                new_activation_pattern = old_activation_pattern.clone()
+                                new_activation_pattern[i] = 1
+                                region.activation_pattern = new_activation_pattern
+                            else:
+                                new_activation_pattern = old_activation_pattern.clone()
+                                new_activation_pattern[i] = 0
+                                region.activation_pattern = new_activation_pattern
+                        elif len(intersection) > 0:           # TODO: Necessary? Imo this is useless, the region IS cut.
                             idx_to_remove.append(idx)
                             new_vertices = np.concatenate((vertices[np.where(sign > 0)[0]], intersection), axis=0)
                             new_activation_pattern = old_activation_pattern.clone()
@@ -61,7 +65,6 @@ def exact_count_2D(layers, images_plane, init_vertices):
                             )
                             new_regions.append(new_region)
                     else:                               # Region is not cut
-                        no_cut_counter += 1
                         if sign[0] == 1:                    # TODO: Find cleaner way to do this
                             new_activation_pattern = old_activation_pattern.clone()
                             new_activation_pattern[i] = 1

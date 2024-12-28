@@ -35,7 +35,7 @@ def compute_line_segment_intersection(p1, p2, line_coeffs, images_plane):
 
     t = -(b + w @ p1_emb) / denominator
     t = t.item()
-    if 0 <= t <= 1:              # Check if intersection is within the segment
+    if 0 < t < 1:              # Check if intersection is within the segment
         return (x1 + t * (x2 - x1), y1 + t * (y2 - y1))
     return None
 
@@ -49,9 +49,6 @@ def compute_line_region_intersection(convex_hull, line_coeffs, images_plane):
     points = convex_hull.points
     for edge in convex_hull.simplices:
         p1, p2 = points[edge[0]], points[edge[1]]
-        #p1 = embedding(p1[..., np.newaxis], images)
-        #p2 = embedding(p2[..., np.newaxis], images)
-        #print(p1.shape)
         point = compute_line_segment_intersection(p1, p2, line_coeffs, images_plane)
         if point is not None:
             intersections.append(point)
@@ -80,13 +77,13 @@ def update_linear_maps(regions, W, b):
     for region in regions:
         region.update_linear_map(W, b)
 
-def random_mnist_images(n, PATH):
+def random_mnist_images(n, PATH, image_size=28):
     """
     Randomly select n images from MNIST training set located at PATH.
     """
-    image_size = 28
     transform = transforms.Compose([
         transforms.ToTensor(),
+        transforms.Resize((image_size,image_size)),
         transforms.Lambda(lambda x: x.view(image_size * image_size, 1)),
     ])
     train_dataset = datasets.MNIST(PATH,
@@ -95,7 +92,7 @@ def random_mnist_images(n, PATH):
     idx = [random.randint(0, len(train_dataset)-1) for i in range(n)]
     images = []
     for i in range(len(idx)):
-        images.append(train_dataset[i][0])
+        images.append(train_dataset[idx[i]][0])
     images = torch.cat(images, dim=1).T
     images = images[..., None]
     return images
