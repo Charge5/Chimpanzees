@@ -433,10 +433,10 @@ def main(args=None):
 
     # Example usage
     results_path =  os.path.join(mammoth_path, "data/results/ETH")
-    file_path = os.path.join(results_path,"results.csv")
+    file_path = os.path.join(results_path,"results4.csv")
     # file_path = "example.csv"
     import ast
-    logs_path = "/Users/thomaszilliox/Documents/git_repos/Chimpanzees/Code/src/mammoth/data/results/class-il/seq-mnist/lwf_mc/logs.pyd"
+    logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/lwf_mc/logs.pyd")
     f = open(logs_path, "r")
     results = f.readlines()
     last_results = results[-1]

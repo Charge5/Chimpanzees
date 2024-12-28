@@ -1,0 +1,1 @@
+--datasetseq-mnist--backbonemnistmlp--modellwf-mc--lr0.001--seed42--n_epochs10--mlp_hidden_size25--mlp_hidden_depth10
