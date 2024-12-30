@@ -5,7 +5,6 @@ import random
 import matplotlib.pyplot as plt
 
 ROOT_DIR = os.getcwd()
-print(ROOT_DIR)
 MAMMOTH_PATH = os.path.join(ROOT_DIR, r'src/mammoth')
 sys.path.append(MAMMOTH_PATH)
 device = torch.device("cpu")
@@ -29,30 +28,35 @@ model.eval()                        # ContinualModel object
 backbone = model.net                # MammothBackbone object
 features = backbone._features       # Sequential object containing the layers
 
+# Randomly choose 3 images to define the plane
+from src.activationregion.utils.utils import random_mnist_images
+#MNIST_PATH = os.path.join(MAMMOTH_PATH, r'data/MNIST')
+images_plane = random_mnist_images(3)
+
 """
 1st method: Exact counting (new way)
 """
-from src.counting.exact_counting import exact_count_2D
-from src.counting.exact_counting_utils import plot_regions, random_mnist_images
+from src.activationregion.core import exact_count_2D
+from src.activationregion.utils.plot import plot_regions_exact
 
-# Randomly choose 3 images to define the plane
-MNIST_PATH = os.path.join(MAMMOTH_PATH, r'data/MNIST')
-images_plane = random_mnist_images(3, MNIST_PATH)
-
+# Count the number of regions in the plane going through these 3 images 
+# (more precisely, only in the square [-1.5, 0.5]^2, not the entire plane)
 regions = exact_count_2D(features, images_plane, init_vertices=[[-1.5, -1.5], [-1.5, 0.5], [0.5, 0.5], [0.5, -1.5]])
 print(f"Number of regions: {len(regions)}")
-fig2 = plot_regions(regions)
+fig4 = plot_regions_exact(regions)
 
 """
 2nd method: Sample counting (old way)
 """
-from src.counting.sample_counting import sample_count_2D
-from src.counting.sample_counting_utils import plot_partition
+from src.activationregion.core import sample_count_2D
+from src.activationregion.utils.plot import plot_regions_sample
 
-# Count the number of regions in the plane going through these 3 images (more precisely, only in the square [-1.5, 0.5]^2 not the entire plane)
-n_regions, inverse_indices = sample_count_2D(features, images_plane, domain_bounds=[-1.5, 0.5], n_samples=1000, return_inverse=True)
+n_regions, inverse_indices, x1, x2 = sample_count_2D(features, images_plane, domain_bounds=[-1.5, 0.5], n_samples=1000, return_inverse=True)
 print(f"Number of regions: {n_regions}")
-fig1 = plot_partition(inverse_indices, images_plane, n_samples=1000, domain_bounds=[-1.5, 0.5])
+fig3 = plot_regions_sample(inverse_indices, x1, x2, n_samples=1000)
 
 # Show the plots of both methods
 plt.show()
+
+# 5473
+# 5088
