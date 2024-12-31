@@ -8,6 +8,7 @@ import random
 import os
 import datetime
 from src.activationregion.core import count_for_experiment
+import time
 
 np.random.seed(0)
 random.seed(0)
@@ -24,15 +25,18 @@ a probablistic upper bound.
 
 # Utils to log the experiment
 def create_dir():
-    current_time = datetime.datetime.now().isoformat()
-    current_time = current_time.replace(":", "_").split(".")[0]
+    #current_time = datetime.datetime.now().isoformat()
+    current_time = datetime.datetime.now().strftime('%Y-%m-%d')
+    #current_time = current_time.replace(":", "_").split(".")[0]
     results_output_path = r'replication_paper/'
     results_output_path = os.path.join(results_output_path, current_time)
-    os.mkdir(results_output_path)
+    os.makedirs(results_output_path, exist_ok=True)
     return results_output_path
 
 def save_params(params, save_path):
-    file = os.path.join(save_path, r'parameters.txt')
+    depth = params['depth']
+    width = params['width']
+    file = os.path.join(save_path, f"parameters_{depth}_{width}.txt")
     with open(file, "w") as file:
         for key, value in params.items():
             file.write(f'{key}: {value}\n')
@@ -152,7 +156,7 @@ def save_plot(counts_vals, curves, width, depth, save_path=r'replication_paper')
 
     fig, axes = plt.subplots(1, 2, figsize=(15, 4))
     # closeup
-    axes[0].plot(counts_vals[:9], mean_curve[:9], label = f"depth:{depth}, width:{width}", color="blue", linewidth=2, marker='o')
+    axes[0].plot(counts_vals[:9], mean_curve[:9], label = f"depth:{depth}, width:{width}", color="blue", linewidth=0.8, marker='.', markersize=4)
     axes[0].fill_between(counts_vals[:9], mean_curve[:9] - std_dev[:9], mean_curve[:9] + std_dev[:9], color="lightblue", alpha=0.5)
     axes[0].set_xlabel("Epoch")
     axes[0].set_ylabel("Number of Regions over \n squared number of neurons")
@@ -160,7 +164,7 @@ def save_plot(counts_vals, curves, width, depth, save_path=r'replication_paper')
     axes[0].grid(True)
 
     # Full
-    axes[1].plot(counts_vals, mean_curve, label = f"depth:{depth}, width:{width}", color="blue", linewidth=2, marker='o')
+    axes[1].plot(counts_vals, mean_curve, label = f"depth:{depth}, width:{width}", color="blue", linewidth=0.8, marker='.', markersize=4)
     axes[1].fill_between(counts_vals, mean_curve - std_dev, mean_curve + std_dev, color="lightblue", alpha=0.5)
     axes[1].set_xlabel("Epoch")
     axes[1].set_ylabel("Number of Regions over \n squared number of neurons")
@@ -169,25 +173,26 @@ def save_plot(counts_vals, curves, width, depth, save_path=r'replication_paper')
 
     fig.tight_layout()
     # save figure
-    plt.savefig(os.path.join(save_path, r'experiment1.png'))
+    plt.savefig(os.path.join(save_path, f'experiment1_{depth}_{width}.png'))
 
 # Run the experiment :
 dir_path = create_dir()
 
 # Modify the parameters of the experiment directly in the dictionary
 params = {
-    'n_experiment': 5,
+    'n_experiment': 10,
     'n_planes': 5,
-    'width': 16,
-    'depth': 4,
+    'width': 40,
+    'depth': 3,
     'image_size': image_size,
     'lr': 0.001,
-    'n_epochs': 10,
-    'count_vals': np.array([1, 2, 3, 4, 5, 7, 8, 10]),
+    'n_epochs': 15,
+    'count_vals': np.array([1, 2, 3, 5, 8, 10, 15]),
     'init_vertices': [[-500, -500], [-500, 500], [500, 500], [500, -500]]
 }
 save_params(params, dir_path)
 
+tic = time.time()
 curves = []
 for i in range(params['n_experiment']):
     print(f"Experiment {i+1}/{params['n_experiment']}")
@@ -198,8 +203,52 @@ for i in range(params['n_experiment']):
                                           params['count_vals'], init_vertices=params['init_vertices'],
                                           with_closeup=True, image_size=params['image_size'], verbose=True)
     curves.append(region_evol)
+toc = time.time()
+print(f"Total time: {toc-tic}")
 
 curves = np.array(curves)
-np.save(os.path.join(dir_path, r'curves'), curves)
+depth = params['depth']
+width = params['width']
+np.save(os.path.join(dir_path, f'curves_{depth}_{width}'), curves)
 
 save_plot(x_vals, curves, width=params['width'], depth=params['depth'], save_path=dir_path)
+
+"""
+#Generate final plot with all curves
+curves1 = np.load(r'replication_paper/2024-12-30/curves_4_16.npy')
+curves2 = np.load(r'replication_paper/2024-12-30/curves_3_20.npy')
+curves3 = np.load(r'replication_paper/2024-12-31/curves_3_40.npy')
+
+curves = [curves1, curves2, curves3]
+counts_vals = np.array([0, 0.02, 0.04, 0.06, 0.1, 0.2, 0.3, 0.4, 0.5, 1, 2, 3, 5, 8, 10, 15])
+
+fig, axes = plt.subplots(2, 1, figsize=(7, 5))
+params = [(4, 16), (3, 20), (3, 40)]
+# closeup
+colors = ['blue', 'green', 'coral']
+for i in range(3):
+    depth, width = params[i]
+    n_neurons = depth * width
+    curves_arr = np.array(curves[i])/((n_neurons)**2)
+    mean_curve = np.mean(curves_arr, axis=0)
+    std_dev = np.std(curves_arr, axis=0)
+    axes[0].plot(counts_vals[:9], mean_curve[:9], label = f"depth:{depth}, width:{width}", linewidth=0.8, marker='.', markersize=4, color=colors[i])
+    axes[0].fill_between(counts_vals[:9], mean_curve[:9] - std_dev[:9], mean_curve[:9] + std_dev[:9], color='light'+colors[i], alpha=0.3)
+    axes[0].set_xlabel("Epoch")
+    axes[0].set_ylabel("Number of Regions over \n squared number of neurons")
+    axes[0].legend()
+    axes[0].grid(True)
+
+    # Full
+    axes[1].plot(counts_vals, mean_curve, label = f"depth:{depth}, width:{width}", linewidth=0.8, marker='.', markersize=4, color=colors[i])
+    axes[1].fill_between(counts_vals, mean_curve - std_dev, mean_curve + std_dev, color='light'+colors[i], alpha=0.3)
+    axes[1].set_xlabel("Epoch")
+    axes[1].set_ylabel("Number of Regions over \n squared number of neurons")
+    axes[1].legend()
+    axes[1].grid(True)
+
+fig.tight_layout()
+# save figure
+plt.show()
+
+"""
