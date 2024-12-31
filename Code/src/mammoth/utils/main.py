@@ -14,6 +14,7 @@ To run the script, execute it directly or import it as a module and call the `ma
 # All rights reserved.
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+run_on_colab = True
 
 # needed (don't change it)
 import logging
@@ -434,13 +435,14 @@ def main(args=None):
     # Example usage
     results_path =  os.path.join(mammoth_path, "data/results/ETH")
     file_path = os.path.join(results_path,"results4.csv")
-    # file_path = "example.csv"
+    if run_on_colab:
+        file_path = "results.csv"
     import ast
     logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/lwf_mc/logs.pyd")
     f = open(logs_path, "r")
     results = f.readlines()
     last_results = results[-1]
-    last_results = last_results.replace("np.float64(", "").replace(")", "").replace("device(type=", "")
+    last_results = last_results.replace("np.float64(", "").replace(")", "").replace("device(type=", "").replace("index=0",'"index":0')
 
     # Convert the string to a dictionary
     last_results = ast.literal_eval(last_results)

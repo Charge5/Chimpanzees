@@ -3,6 +3,9 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+run_on_colab = True
+
+
 import numpy as np
 import copy
 import math
@@ -428,6 +431,35 @@ def train(model: ContinualModel, dataset: ContinualDataset,
             model_file = os.path.join(eth_path,f"model_task_{t+1}.pt")
             # torch.save(model.state_dict(), model_file)
             torch.save(model, model_file)
+
+            if run_on_colab :
+                from google.colab import files
+                files.download(model_file)
+
+
+            # model.eval()  # ContinualModel object
+            # backbone = model.net  # MammothBackbone object
+            # features = backbone._features  # Sequential object containing the layers
+
+
+
+
+
+            # from activationregion.utils.utils import random_mnist_images
+            # # MNIST_PATH = os.path.join(MAMMOTH_PATH, r'data/MNIST')
+            # images_plane = random_mnist_images(3)
+            #
+            # """
+            # 1st method: Exact counting (new way)
+            # """
+            # from src.activationregion.core import exact_count_2D
+            # from src.activationregion.utils.plot import plot_regions_exact
+
+            # Count the number of regions in the plane going through these 3 images
+            # (more precisely, only in the square [-1.5, 0.5]^2, not the entire plane)
+            # regions = exact_count_2D(features, images_plane,
+            #                          init_vertices=[[-1.5, -1.5], [-1.5, 0.5], [0.5, 0.5], [0.5, -1.5]])
+            # print(f"Number of regions: {len(regions)}")
 
             # f = open(model_file, "w")
 
