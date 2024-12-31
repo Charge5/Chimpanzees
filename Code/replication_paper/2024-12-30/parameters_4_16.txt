@@ -1,0 +1,9 @@
+n_experiment: 10
+n_planes: 5
+width: 16
+depth: 4
+image_size: 16
+lr: 0.001
+n_epochs: 15
+count_vals: [ 1  2  3  5  8 10 15]
+init_vertices: [[-500, -500], [-500, 500], [500, 500], [500, -500]]
