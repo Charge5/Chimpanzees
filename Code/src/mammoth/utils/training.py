@@ -432,9 +432,9 @@ def train(model: ContinualModel, dataset: ContinualDataset,
             # torch.save(model.state_dict(), model_file)
             torch.save(model, model_file)
 
-            if run_on_colab :
-                from google.colab import files
-                files.download(model_file)
+            # if run_on_colab :
+            #     from google.colab import files
+            #     files.download(model_file)
 
 
             # model.eval()  # ContinualModel object

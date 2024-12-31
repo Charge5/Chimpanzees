@@ -12,4 +12,5 @@ root_dir = os.getcwd()
 results_dir = os.path.join(root_dir,results_dir)
 
 print(results_dir)
-2024-12-23T16_32_49
+result_dir = os.path.join(results_dir,"2024-12-23T16_32_49")
+print(result_dir)
