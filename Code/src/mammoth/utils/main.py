@@ -436,7 +436,7 @@ def main(args=None):
     results_path =  os.path.join(mammoth_path, "data/results/ETH")
     file_path = os.path.join(results_path,"results4.csv")
     if run_on_colab:
-        file_path = "results2.csv"
+        file_path = "results.csv"
     import ast
     logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/lwf_mc/logs.pyd")
     f = open(logs_path, "r")
