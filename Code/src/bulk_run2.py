@@ -32,6 +32,7 @@ if __name__ == "__main__":
     learning_rates = [0.001]
     # epochs = [10,20]
     epochs = [x for x in range(10,110,10)]
+    epochs = [1]
     depth = [2]
     # depth = [2,5,10]
     # width = [x for x

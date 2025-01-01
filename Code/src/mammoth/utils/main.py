@@ -436,7 +436,7 @@ def main(args=None):
     results_path =  os.path.join(mammoth_path, "data/results/ETH")
     file_path = os.path.join(results_path,"results4.csv")
     if run_on_colab:
-        file_path = "results.csv"
+        file_path = "results2.csv"
     import ast
     logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/lwf_mc/logs.pyd")
     f = open(logs_path, "r")
@@ -447,8 +447,10 @@ def main(args=None):
     # Convert the string to a dictionary
     last_results = ast.literal_eval(last_results)
 
-    headers = ["Epochs","Learning Rate" ,"Depth", "Width","Mean"]
-    data = [args.n_epochs,args.lr, args.mlp_hidden_depth, args.mlp_hidden_size,last_results[f'accmean_task{5}']]
+    start_date = os.path.split(eth_output_path)[-1]
+    headers = ["Date","Epochs","Learning Rate" ,"Depth", "Width","Mean","Mean_array"]
+    mean_array = [last_results[f"accuracy_{x+1}_task5"] for x in range(5)]
+    data = [start_date,args.n_epochs,args.lr, args.mlp_hidden_depth, args.mlp_hidden_size,last_results[f'accmean_task{5}'],mean_array]
 
     append_to_csv(file_path, data, headers=headers)
 
