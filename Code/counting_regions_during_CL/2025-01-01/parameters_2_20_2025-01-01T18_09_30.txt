@@ -1,0 +1,8 @@
+n_experiment: 10
+n_planes: 5
+init_vertices: [[-500, -500], [-500, 500], [500, 500], [500, -500]]
+lr: 0.01
+n_epochs: 60
+mlp_hidden_size: 20
+mlp_hidden_depth: 2
+info: {'count_vals': [0, 1, 2, 3, 5, 10, 20, 30, 40, 50, 57, 58, 59], 'n_tasks': 5, 'seeds': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'RESULTS_PATH': ['/Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-01 18_09', '/Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-01 18_29', '/Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-01 18_50', '/Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-01 19_11', '/Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-01 19_32', '/Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-01 19_54', '/Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-01 20_16', '/Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-01 20_37', '/Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-01 20_57', '/Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-01 21_16']}
