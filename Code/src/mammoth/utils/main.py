@@ -43,8 +43,11 @@ from utils import setup_logging
 import datetime
 setup_logging()
 
-def create_eth_dir():
-    current_time = datetime.datetime.now().isoformat()
+def create_eth_dir(with_seconds=True):
+    if with_seconds:
+        current_time = datetime.datetime.now().isoformat()
+    else:
+        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
     current_time = current_time.replace(":", "_").split(".")[0]
     eth_output_path = os.path.join(mammoth_path, "data/results/ETH")
     if not os.path.exists(eth_output_path):
@@ -179,6 +182,7 @@ def parse_args():
     add_initial_args(parser)
     args = parser.parse_known_args()[0]
     parser.add_argument("--mlp_hidden_depth", type=int, required=False, help="Size of the input layer")
+    parser.add_argument("--save_models_within_tasks", type=bool, required=False, help="Save the models at specific epochs during training")
 
 
     if args.backbone is None:
@@ -405,7 +409,7 @@ def main(args=None):
     except Exception:
         pass
 
-    eth_output_path = create_eth_dir()
+    eth_output_path = create_eth_dir(with_seconds=not args.save_models_within_tasks)
 
     training_settings = open(os.path.join(eth_output_path,"training_settings.txt"),"w")
     # training_settings.write(sys.argv[:])
@@ -413,7 +417,10 @@ def main(args=None):
         training_settings.write(i)
     training_settings.close()
 
-    train(model, dataset, args,eth_output_path)
+    if args.save_models_within_tasks:
+        train(model, dataset, args,eth_output_path, save_within_tasks=True)
+    else:
+        train(model, dataset, args,eth_output_path, save_within_tasks=False)
 
 
 
