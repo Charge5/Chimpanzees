@@ -28,25 +28,29 @@ def run_command(command: str):
 if __name__ == "__main__":
     print("Start multiple run...")
 
-    # learning_rates = [0.001,0.01]
-    learning_rates = [0.001]
+    learning_rates = [0.001,0.01]
+    learning_rates = [0.01]
     # epochs = [10,20]
-    epochs = [x for x in range(10,110,10)]
-    epochs = [1]
-    depth = [2]
+    # epochs = [x for x in range(10,110,10)]
+    # epochs = [1]
+    depth = [2,5]
     # depth = [2,5,10]
     # width = [x for x
     # in range(25,25,5)]
     # width = [50,75]
-    width = [5]
+    width = [5, 10, 15, 20, 50, 75, 100 ]
+    epochs = [50]
+    seed = [x for x in range (0,10,1)]
+    seed = [x for x in range(0, 5, 1)]
+
     # Generate Cartesian product
-    combinations = list(product(learning_rates, epochs, depth, width))
+    combinations = list(product(learning_rates, seed, depth, width))
     total_combinations = len(combinations)
 
     for i, (lr, ep, d, w) in enumerate(combinations, start=1):
-        print(f"Iteration {i}/{total_combinations} - Learning rate: {lr}, Epochs: {ep}, Depth: {d}, Width: {w}")
+        print(f"Iteration {i}/{total_combinations} - Learning rate: {lr}, Epochs: 50, Depth: {d}, Width: {w}, Seed: {ep}")
         start_time = time.time()  # Start timing
-        cmd = f"python mammoth/utils/main.py --dataset seq-mnist --backbone mnistmlp --model lwf-mc  --lr {lr} --seed 42 --n_epochs {ep} --mlp_hidden_size {w} --mlp_hidden_depth {d}"  # Replace with your desired command
+        cmd = f"python mammoth/utils/main.py --dataset seq-mnist --backbone mnistmlp --model lwf-mc  --lr {lr} --seed {ep} --n_epochs 50 --mlp_hidden_size {w} --mlp_hidden_depth {d} --enable_other_metrics True"  # Replace with your desired command
         run_command(cmd)
         end_time = time.time()  # Start timing
         elapsed_time = end_time - start_time
