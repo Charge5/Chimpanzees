@@ -12,21 +12,21 @@ import subprocess
 import logging
 from utils_for_experiments import create_dir, setup_logging, save_params, run_command, format_time
 
+### ---------------------------------------------------------------- ###
+
+# This script runs an experiment to count the number of activation regions during continual learning.
+# In details, here is what it does:
+# 1. Run Mammoth on the MNIST dataset whith a specific parameters (see below the dictionnary 'params') and save the underlying model at different epochs.
+# 2. Load the saved models and count the number of activation regions at different epochs during training.
+# 3. Save the results, logs and plot.
+
 ### ------------- UTILS, SEE BELOW FOR THE EXPERIMENT -------------- ###
 
 ROOT_DIR = os.getcwd()
 MAMMOTH_PATH = os.path.join(ROOT_DIR, r'src/mammoth')
 MNIST_PATH = os.path.join(MAMMOTH_PATH, r'data/MNIST')
 sys.path.append(MAMMOTH_PATH)
-
-"""
-if torch.backends.mps.is_available():
-    device = torch.device("mps")
-else:
-    device = torch.device("cpu")
-"""
 device = torch.device("cpu")
-#torch.set_default_device("mps")
 torch.manual_seed(0)                # Reproducibility
 random.seed(0)
 
@@ -84,20 +84,26 @@ def save_plot(values, results, n_tasks, save_path, filename):
     plt.tight_layout()
     plt.savefig(os.path.join(save_path, filename))
 
-### ------------- EXPERIMENT -------------- ###
+### ------------------------ EXPERIMENT ---------------------------- ###
 
+# Create a directory to save results and logs
 dir_path = create_dir(dir_path=r'counting_regions_during_CL', format='%Y-%m-%d')
 
+# Set the parameters of the experiment
+# You can change edit them directly in the dictionary
 params = {
     'n_experiment': 10,
     'n_planes': 5,
     'init_vertices': [[-500, -500], [-500, 500], [500, 500], [500, -500]],
     'lr': 0.01,
     'n_epochs': 50,
-    'mlp_hidden_size': 20,
+    'mlp_hidden_size': 70,
     'mlp_hidden_depth': 2,
+    'model': 'lwf-mc',
     'info': {}
 }
+
+# Run the experiment
 width = params['mlp_hidden_size']
 depth = params['mlp_hidden_depth']
 begin_time = datetime.datetime.now().isoformat()
@@ -107,7 +113,6 @@ setup_logging(log_path=dir_path, log_name=f'log_{depth}_{width}_{begin_time}.txt
 logging.info(f"Results will be saved at: {dir_path}")
 logging.info(f"Starting the experiment with parameters:\n {params}")
 
-#params['info']['count_vals'] = [0, 1, 2, 3, 5, 10, 20, 30, 40, 50, 57, 58, 59]
 params['info']['count_vals'] = [0, 1, 2, 5, 10, 25, 40, 45, 48, 49]
 params['info']['n_tasks'] = 5
 params['info']['seeds'] = [i for i in range(params['n_experiment'])]
@@ -120,7 +125,7 @@ for k in range(params['n_experiment']):
     seeds = params['info']['seeds']
     logging.info(f'Seed: {seeds[k]}')
 
-    cmd = f"python utils/main.py --dataset seq-mnist --backbone mnistmlp --model lwf-mc  \
+    cmd = f"python utils/main.py --dataset seq-mnist --backbone mnistmlp --model {params['model']}  \
             --lr {params['lr']} --seed {params['info']['seeds'][k]} --n_epochs {params['n_epochs']}\
             --mlp_hidden_size {params['mlp_hidden_size']} --mlp_hidden_depth {params['mlp_hidden_depth']}\
             --save_models_within_tasks True"
@@ -169,7 +174,9 @@ save_params(params, dir_path, filename=f'parameters_{depth}_{width}_{begin_time}
 toc = time.time()
 logging.info(f'Duration: {toc - tic} seconds.')
 
+### ------------------------ EXPERIMENT DONE ---------------------------- ###
 
+# Below is the code to plot the results of several runs of the above experiment on same figure.
 """
 #Generate final plot with all curves
 results1 = np.load(r'counting_regions_during_CL/2025-01-02/results_2_20_2025-01-02T12_26_40.npy')
