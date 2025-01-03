@@ -1,0 +1,1 @@
+--datasetseq-mnist--backbonemnistmlp--modellwf-mc--lr0.01--seed2--n_epochs50--mlp_hidden_size50--mlp_hidden_depth2--save_models_within_tasksTrue

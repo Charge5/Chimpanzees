@@ -18,7 +18,15 @@ ROOT_DIR = os.getcwd()
 MAMMOTH_PATH = os.path.join(ROOT_DIR, r'src/mammoth')
 MNIST_PATH = os.path.join(MAMMOTH_PATH, r'data/MNIST')
 sys.path.append(MAMMOTH_PATH)
+
+"""
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+else:
+    device = torch.device("cpu")
+"""
 device = torch.device("cpu")
+#torch.set_default_device("mps")
 torch.manual_seed(0)                # Reproducibility
 random.seed(0)
 
@@ -63,12 +71,12 @@ def save_plot(values, results, n_tasks, save_path, filename):
     custom_xtick_labels = ["0"]
 
     for i in range(n_tasks):
-        xticks_for_task = np.array([20, 40, 60]) + i * max(values)
+        xticks_for_task = np.array([15, 30, 45]) + i * max(values)
         custom_xticks.extend(xticks_for_task)
         if i == 0:
-            custom_xtick_labels.extend([str(tick) for tick in [20, 40, 60]])
+            custom_xtick_labels.extend([str(tick) for tick in [15, 30, 45]])
         else:
-            custom_xtick_labels.extend([str(tick) for tick in [20, 40, 60]])
+            custom_xtick_labels.extend([str(tick) for tick in [15, 30, 45]])
     plt.xticks(ticks=custom_xticks, labels=custom_xtick_labels, rotation=45, ha='right', fontsize=15)
     plt.grid(alpha=0.3)
     plt.yticks(fontsize=15)
@@ -85,7 +93,7 @@ params = {
     'n_planes': 5,
     'init_vertices': [[-500, -500], [-500, 500], [500, 500], [500, -500]],
     'lr': 0.01,
-    'n_epochs': 60,
+    'n_epochs': 50,
     'mlp_hidden_size': 20,
     'mlp_hidden_depth': 2,
     'info': {}
@@ -99,7 +107,8 @@ setup_logging(log_path=dir_path, log_name=f'log_{depth}_{width}_{begin_time}.txt
 logging.info(f"Results will be saved at: {dir_path}")
 logging.info(f"Starting the experiment with parameters:\n {params}")
 
-params['info']['count_vals'] = [0, 1, 2, 3, 5, 10, 20, 30, 40, 50, 57, 58, 59]
+#params['info']['count_vals'] = [0, 1, 2, 3, 5, 10, 20, 30, 40, 50, 57, 58, 59]
+params['info']['count_vals'] = [0, 1, 2, 5, 10, 25, 40, 45, 48, 49]
 params['info']['n_tasks'] = 5
 params['info']['seeds'] = [i for i in range(params['n_experiment'])]
 params['info']['RESULTS_PATH'] = []
@@ -159,3 +168,60 @@ save_params(params, dir_path, filename=f'parameters_{depth}_{width}_{begin_time}
 
 toc = time.time()
 logging.info(f'Duration: {toc - tic} seconds.')
+
+
+"""
+#Generate final plot with all curves
+results1 = np.load(r'counting_regions_during_CL/2025-01-02/results_2_20_2025-01-02T12_26_40.npy')
+results2 = np.load(r'counting_regions_during_CL/2025-01-02/results_2_50_2025-01-02T02_03_11.npy')
+params = [(2, 20), (2, 50)]
+results = [results1, results2]
+count_values = [0, 1, 2, 5, 10, 25, 40, 45, 48, 49]
+
+def plot_n_regions_CL(values, results, params, n_tasks=5):
+    colors = plt.cm.Set1(np.linspace(0, 1, n_tasks))
+    plt.figure(figsize=(12, 6))
+    for j in range(len(results)):
+        depth, width = params[j]
+        n_neurons = width * depth
+        mean_curve = np.mean(results[j] / n_neurons**2, axis=2)
+        std_dev = np.std(results[j] / n_neurons**2, axis=2)
+
+        mean_curve = mean_curve.flatten()
+        std_dev = std_dev.flatten()
+
+        x_values = np.array([np.array(values) + i * max(values) for i in range(n_tasks)]).flatten()
+        plt.plot(x_values, np.log(mean_curve), marker='.', markersize=4, color=colors[j], linestyle='-', linewidth=0.8, label=f'depth: {depth}, width: {width}')
+        plt.fill_between(x_values, np.log(mean_curve - std_dev), np.log(mean_curve + std_dev), color=colors[j], alpha=0.1)
+
+    for i in range(n_tasks):
+        task_label_position = np.mean(np.array(values) + i * max(values))
+        plt.text(task_label_position,
+                plt.ylim()[0] + 0.05 * (plt.ylim()[1] - plt.ylim()[0]),
+                f"Task {i + 1}",
+                ha='center',
+                va='top',
+                fontsize=15,
+                color='black')
+
+    plt.xlabel('Epochs and tasks', fontsize=20)
+    plt.ylabel('Number of regions \n over squared number of neurons', fontsize=20)
+    custom_xticks = [0]
+    custom_xtick_labels = ["0"]
+
+    for i in range(n_tasks):
+        xticks_for_task = np.array([15, 30, 45]) + i * max(values)
+        custom_xticks.extend(xticks_for_task)
+        if i == 0:
+            custom_xtick_labels.extend([str(tick) for tick in [15, 30, 45]])
+        else:
+            custom_xtick_labels.extend([str(tick) for tick in [15, 30, 45]])
+    plt.xticks(ticks=custom_xticks, labels=custom_xtick_labels, rotation=45, ha='right', fontsize=15)
+    plt.yticks(fontsize=15)
+    plt.grid(alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+plot_n_regions_CL(count_values, results, params)
+"""
