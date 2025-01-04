@@ -240,7 +240,7 @@ def train(model: ContinualModel, dataset: ContinualDataset,
         args: the arguments of the current execution
     """
     print(args)
-    saving_times = [1, 2, 3, 5, 10, 20, 30, 40, 50, 57, 58, 59] if save_within_tasks else []
+    saving_times = [0, 1, 2, 5, 10, 25, 40, 45, 48, 49] if save_within_tasks else []
 
     is_fwd_enabled = True
     can_compute_fwd_beforetask = True
