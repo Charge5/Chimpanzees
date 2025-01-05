@@ -183,7 +183,7 @@ def parse_args():
     args = parser.parse_known_args()[0]
     parser.add_argument("--mlp_hidden_depth", type=int, required=False, help="Size of the input layer")
     parser.add_argument("--save_models_within_tasks", type=bool, required=False, help="Save the models at specific epochs during training")
-
+    parser.add_argument("--save_accuracy_within_tasks", type=bool, required=False, help="Save the accuracy at specific epochs during training")
 
     if args.backbone is None:
         logging.warning('No backbone specified. Using default backbone (set by the dataset).')
@@ -408,8 +408,11 @@ def main(args=None):
         setproctitle.setproctitle('{}_{}_{}'.format(args.model, args.buffer_size if 'buffer_size' in args else 0, args.dataset))
     except Exception:
         pass
-
-    eth_output_path = create_eth_dir(with_seconds=not args.save_models_within_tasks)
+    
+    if args.save_models_within_tasks or args.save_accuracy_within_tasks:
+        eth_output_path = create_eth_dir(with_seconds=False)
+    else:
+        eth_output_path = create_eth_dir(with_seconds=True)
 
     training_settings = open(os.path.join(eth_output_path,"training_settings.txt"),"w")
     # training_settings.write(sys.argv[:])
@@ -421,8 +424,6 @@ def main(args=None):
         train(model, dataset, args,eth_output_path, save_within_tasks=True)
     else:
         train(model, dataset, args,eth_output_path, save_within_tasks=False)
-
-
 
     def append_to_csv(file_path, data, headers=None):
         # Check if the file exists
