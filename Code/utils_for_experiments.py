@@ -3,6 +3,13 @@ import os
 import logging
 import subprocess
 
+### ---------------------------------------------------------------- ###
+
+# This file contains utility functions for experiments, e.g. creating 
+# directories, setting up logs or running commands.
+
+### ---------------------------------------------------------------- ###
+
 def format_time(current_time):
     current_time = current_time.replace(":", "_").split(".")[0]
     return current_time

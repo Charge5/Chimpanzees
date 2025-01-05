@@ -14,20 +14,23 @@ np.random.seed(0)
 random.seed(0)
 torch.manual_seed(0)
 
-"""
-Make sure to run this script from /Code directory.
-This experiment aims at reproducing the results from Figure 3 of https://arxiv.org/abs/1906.00904.
-Sine the method to count the number of activation regions was only outlined in the above paper,
-we consider this experiment as a validation tool for our implementation.
-We give special attention to the number of activation regions at initizialization as Theorem 5 gives
-a probablistic upper bound.
-"""
+### ---------------------------------------------------------------- ###
+# Make sure to run this script from the /Code directory.
 
-# Utils to log the experiment
+# GOAL:   Reproduce results from Figure 3 of https://arxiv.org/abs/1906.00904.
+# OUTPUT: Results, logs and plot will be saved in the folder 'Code/replication_paper'.
+
+# DETAILS: Since the method to count the number of activation regions was only 
+# outlined in the above paper, we consider this experiment as a validation tool 
+# for our implementation. This script trains different MLP model on MNIST dataset and 
+# counts the number of activation regions during training. We give special attention 
+# to the number of activation regions at initizialization as Theorem 5 of above paper
+# gives a probablistic upper bound.
+
+### ------------- UTILS, SEE BELOW FOR THE EXPERIMENT -------------- ###
+
 def create_dir():
-    #current_time = datetime.datetime.now().isoformat()
     current_time = datetime.datetime.now().strftime('%Y-%m-%d')
-    #current_time = current_time.replace(":", "_").split(".")[0]
     results_output_path = r'replication_paper/'
     results_output_path = os.path.join(results_output_path, current_time)
     os.makedirs(results_output_path, exist_ok=True)
@@ -175,20 +178,21 @@ def save_plot(counts_vals, curves, width, depth, save_path=r'replication_paper')
     # save figure
     plt.savefig(os.path.join(save_path, f'experiment1_{depth}_{width}.png'))
 
-# Run the experiment :
+### ------------------------ EXPERIMENT ---------------------------- ###
+
 dir_path = create_dir()
 
 # Modify the parameters of the experiment directly in the dictionary
 params = {
-    'n_experiment': 10,
-    'n_planes': 5,
+    'n_experiment': 10,   # Number of independent runs
+    'n_planes': 5,        # Number of planes over which the regions are counted and averaged
     'width': 40,
     'depth': 3,
     'image_size': image_size,
     'lr': 0.001,
     'n_epochs': 15,
-    'count_vals': np.array([1, 2, 3, 5, 8, 10, 15]),
-    'init_vertices': [[-500, -500], [-500, 500], [500, 500], [500, -500]]
+    'count_vals': np.array([1, 2, 3, 5, 8, 10, 15]),    # Epochs at which the regions are counted
+    'init_vertices': [[-500, -500], [-500, 500], [500, 500], [500, -500]]   # Vertices of the initial region
 }
 save_params(params, dir_path)
 
@@ -212,43 +216,3 @@ width = params['width']
 np.save(os.path.join(dir_path, f'curves_{depth}_{width}'), curves)
 
 save_plot(x_vals, curves, width=params['width'], depth=params['depth'], save_path=dir_path)
-
-"""
-#Generate final plot with all curves
-curves1 = np.load(r'replication_paper/2024-12-30/curves_4_16.npy')
-curves2 = np.load(r'replication_paper/2024-12-30/curves_3_20.npy')
-curves3 = np.load(r'replication_paper/2024-12-31/curves_3_40.npy')
-
-curves = [curves1, curves2, curves3]
-counts_vals = np.array([0, 0.02, 0.04, 0.06, 0.1, 0.2, 0.3, 0.4, 0.5, 1, 2, 3, 5, 8, 10, 15])
-
-fig, axes = plt.subplots(2, 1, figsize=(7, 5))
-params = [(4, 16), (3, 20), (3, 40)]
-# closeup
-colors = ['blue', 'green', 'coral']
-for i in range(3):
-    depth, width = params[i]
-    n_neurons = depth * width
-    curves_arr = np.array(curves[i])/((n_neurons)**2)
-    mean_curve = np.mean(curves_arr, axis=0)
-    std_dev = np.std(curves_arr, axis=0)
-    axes[0].plot(counts_vals[:9], mean_curve[:9], label = f"depth:{depth}, width:{width}", linewidth=0.8, marker='.', markersize=4, color=colors[i])
-    axes[0].fill_between(counts_vals[:9], mean_curve[:9] - std_dev[:9], mean_curve[:9] + std_dev[:9], color='light'+colors[i], alpha=0.3)
-    axes[0].set_xlabel("Epoch")
-    axes[0].set_ylabel("Number of Regions over \n squared number of neurons")
-    axes[0].legend()
-    axes[0].grid(True)
-
-    # Full
-    axes[1].plot(counts_vals, mean_curve, label = f"depth:{depth}, width:{width}", linewidth=0.8, marker='.', markersize=4, color=colors[i])
-    axes[1].fill_between(counts_vals, mean_curve - std_dev, mean_curve + std_dev, color='light'+colors[i], alpha=0.3)
-    axes[1].set_xlabel("Epoch")
-    axes[1].set_ylabel("Number of Regions over \n squared number of neurons")
-    axes[1].legend()
-    axes[1].grid(True)
-
-fig.tight_layout()
-# save figure
-plt.show()
-
-"""
