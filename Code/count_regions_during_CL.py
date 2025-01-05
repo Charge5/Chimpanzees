@@ -13,12 +13,15 @@ import logging
 from utils_for_experiments import create_dir, setup_logging, save_params, run_command, format_time
 
 ### ---------------------------------------------------------------- ###
+# Make sure to run this script from the /Code directory.
 
-# This script runs an experiment to count the number of activation regions during continual learning.
-# In details, here is what it does:
-# 1. Run Mammoth on the MNIST dataset whith a specific parameters (see below the dictionnary 'params') and save the underlying model at different epochs.
-# 2. Load the saved models and count the number of activation regions at different epochs during training.
-# 3. Save the results, logs and plot.
+# GOAL: Measure the evolution of the number of activation regions during 
+#       continual learning.
+# OUTPUT: Results, logs and plot will be saved in the folder 'Code/counting_regions_during_CL'.
+
+# DETAILS: This script runs mammoth on an MLP model. Mammoth will save the model at different
+# epochs during training. We then load the saved models and count the number of activation
+# regions.
 
 ### ------------- UTILS, SEE BELOW FOR THE EXPERIMENT -------------- ###
 
@@ -92,14 +95,14 @@ dir_path = create_dir(dir_path=r'counting_regions_during_CL', format='%Y-%m-%d')
 # Set the parameters of the experiment
 # You can change edit them directly in the dictionary
 params = {
-    'n_experiment': 10,
-    'n_planes': 5,
-    'init_vertices': [[-500, -500], [-500, 500], [500, 500], [500, -500]],
-    'lr': 0.01,
+    'n_experiment': 10,   # Number of independent runs
+    'n_planes': 5,      # Number of planes over which the regions are counted and averaged
+    'init_vertices': [[-500, -500], [-500, 500], [500, 500], [500, -500]],  # Vertices of the initial region
+    'lr': 0.001,
     'n_epochs': 50,
     'mlp_hidden_size': 70,
     'mlp_hidden_depth': 2,
-    'model': 'lwf-mc',
+    'model': 'agem',
     'info': {}
 }
 
@@ -125,10 +128,16 @@ for k in range(params['n_experiment']):
     seeds = params['info']['seeds']
     logging.info(f'Seed: {seeds[k]}')
 
-    cmd = f"python utils/main.py --dataset seq-mnist --backbone mnistmlp --model {params['model']}  \
-            --lr {params['lr']} --seed {params['info']['seeds'][k]} --n_epochs {params['n_epochs']}\
-            --mlp_hidden_size {params['mlp_hidden_size']} --mlp_hidden_depth {params['mlp_hidden_depth']}\
-            --save_models_within_tasks True"
+    if params['model'] == 'agem':
+        cmd = f"python utils/main.py --dataset seq-mnist --backbone mnistmlp --model {params['model']}  \
+        --lr {params['lr']} --seed {params['info']['seeds'][k]} --n_epochs {params['n_epochs']}\
+        --mlp_hidden_size {params['mlp_hidden_size']} --mlp_hidden_depth {params['mlp_hidden_depth']}\
+        --save_models_within_tasks True --buffer_size 500"
+    else:
+        cmd = f"python utils/main.py --dataset seq-mnist --backbone mnistmlp --model {params['model']}  \
+                --lr {params['lr']} --seed {params['info']['seeds'][k]} --n_epochs {params['n_epochs']}\
+                --mlp_hidden_size {params['mlp_hidden_size']} --mlp_hidden_depth {params['mlp_hidden_depth']}\
+                --save_models_within_tasks True"
     logging.info(f'Running mammoth with command:\n {cmd}')
     os.chdir(MAMMOTH_PATH)
     current_time = datetime.datetime.now()
@@ -175,60 +184,3 @@ toc = time.time()
 logging.info(f'Duration: {toc - tic} seconds.')
 
 ### ------------------------ EXPERIMENT DONE ---------------------------- ###
-
-# Below is the code to plot the results of several runs of the above experiment on same figure.
-"""
-#Generate final plot with all curves
-results1 = np.load(r'counting_regions_during_CL/2025-01-02/results_2_20_2025-01-02T12_26_40.npy')
-results2 = np.load(r'counting_regions_during_CL/2025-01-02/results_2_50_2025-01-02T02_03_11.npy')
-params = [(2, 20), (2, 50)]
-results = [results1, results2]
-count_values = [0, 1, 2, 5, 10, 25, 40, 45, 48, 49]
-
-def plot_n_regions_CL(values, results, params, n_tasks=5):
-    colors = plt.cm.Set1(np.linspace(0, 1, n_tasks))
-    plt.figure(figsize=(12, 6))
-    for j in range(len(results)):
-        depth, width = params[j]
-        n_neurons = width * depth
-        mean_curve = np.mean(results[j] / n_neurons**2, axis=2)
-        std_dev = np.std(results[j] / n_neurons**2, axis=2)
-
-        mean_curve = mean_curve.flatten()
-        std_dev = std_dev.flatten()
-
-        x_values = np.array([np.array(values) + i * max(values) for i in range(n_tasks)]).flatten()
-        plt.plot(x_values, np.log(mean_curve), marker='.', markersize=4, color=colors[j], linestyle='-', linewidth=0.8, label=f'depth: {depth}, width: {width}')
-        plt.fill_between(x_values, np.log(mean_curve - std_dev), np.log(mean_curve + std_dev), color=colors[j], alpha=0.1)
-
-    for i in range(n_tasks):
-        task_label_position = np.mean(np.array(values) + i * max(values))
-        plt.text(task_label_position,
-                plt.ylim()[0] + 0.05 * (plt.ylim()[1] - plt.ylim()[0]),
-                f"Task {i + 1}",
-                ha='center',
-                va='top',
-                fontsize=15,
-                color='black')
-
-    plt.xlabel('Epochs and tasks', fontsize=20)
-    plt.ylabel('Number of regions \n over squared number of neurons', fontsize=20)
-    custom_xticks = [0]
-    custom_xtick_labels = ["0"]
-
-    for i in range(n_tasks):
-        xticks_for_task = np.array([15, 30, 45]) + i * max(values)
-        custom_xticks.extend(xticks_for_task)
-        if i == 0:
-            custom_xtick_labels.extend([str(tick) for tick in [15, 30, 45]])
-        else:
-            custom_xtick_labels.extend([str(tick) for tick in [15, 30, 45]])
-    plt.xticks(ticks=custom_xticks, labels=custom_xtick_labels, rotation=45, ha='right', fontsize=15)
-    plt.yticks(fontsize=15)
-    plt.grid(alpha=0.3)
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
-
-plot_n_regions_CL(count_values, results, params)
-"""
