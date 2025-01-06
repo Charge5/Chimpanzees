@@ -100,7 +100,7 @@ params = {
     'init_vertices': [[-500, -500], [-500, 500], [500, 500], [500, -500]],  # Vertices of the initial region
     'lr': 0.001,
     'n_epochs': 50,
-    'mlp_hidden_size': 70,
+    'mlp_hidden_size': 50,
     'mlp_hidden_depth': 2,
     'model': 'agem',
     'info': {}
