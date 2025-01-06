@@ -1,0 +1,16 @@
+2025-01-06 14:09:24 - INFO - Results will be saved at: regions_density_after_tasks/2025-01-06
+2025-01-06 14:09:24 - INFO - Starting the experiment.
+2025-01-06 14:09:24 - INFO - Loading MNIST dataset...
+2025-01-06 14:09:24 - INFO - Selecting 3 images ...
+2025-01-06 14:09:24 - INFO - Loading model from: /Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-03 13_38/model_task_2_epoch_0.pt
+2025-01-06 14:09:25 - INFO - Determining the regions ...
+2025-01-06 14:09:41 - INFO - Number of regions: 4383
+2025-01-06 14:09:43 - INFO - Plot saved at: regions_density_after_tasks/2025-01-06
+2025-01-06 14:09:43 - INFO - Loading model from: /Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-03 13_38/model_task_3_epoch_0.pt
+2025-01-06 14:09:43 - INFO - Determining the regions ...
+2025-01-06 14:10:00 - INFO - Number of regions: 4682
+2025-01-06 14:10:01 - INFO - Plot saved at: regions_density_after_tasks/2025-01-06
+2025-01-06 14:10:01 - INFO - Loading model from: /Users/ninocourtecuisse/Documents/ETHZ/Deep learning/Project Deep Learning/Chimpanzees/Code/src/mammoth/data/results/ETH/2025-01-03 13_38/model_task_4_epoch_0.pt
+2025-01-06 14:10:01 - INFO - Determining the regions ...
+2025-01-06 14:10:13 - INFO - Number of regions: 3480
+2025-01-06 14:10:14 - INFO - Plot saved at: regions_density_after_tasks/2025-01-06
