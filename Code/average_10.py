@@ -4,72 +4,73 @@ from itertools import product
 import  numpy as np
 
 
-results_path = "/Users/thomaszilliox/Documents/git_repos/Chimpanzees/Code/src/mammoth/results10-merged.csv"
-results_path = "/Users/thomaszilliox/Documents/git_repos/Chimpanzees/Code/src/mammoth/results20-merged.csv"
 
 
-df = pd.read_csv(results_path)
-df = df.drop(columns=['Date'])
-# df = df.query("Seed != 10")
-# print(df)
+def get_metrics(path):
+    df = pd.read_csv(results_path)
+    df = df.drop(columns=['Date'])
+    # df = df.query("Seed != 10")
+    # print(df)
 
-df = df.drop_duplicates()
-# print(df)
+    df = df.drop_duplicates()
+    # print(df)
 
-depths = df['Depth'].unique()
-epochs = df['Epochs'].unique()
-widths = df['Width'].unique()
+    depths = df['Depth'].unique()
+    epochs = df['Epochs'].unique()
+    widths = df['Width'].unique()
 
-# d = depths[0]
-# e = epochs[0]
-# w = widths[0]
+    # Generate Cartesian product
+    combinations = list(product(depths, epochs, widths))
+    total_combinations = len(combinations)
 
-# Generate Cartesian product
-combinations = list(product(depths, epochs, widths))
-total_combinations = len(combinations)
+    # Extract unique values
+    depths = df['Depth'].unique()
+    epochs = df['Epochs'].unique()
+    widths = df['Width'].unique()
 
-mean_2 = []
-std_2 = []
-f_mean_2 = []
-f_std_2 = []
-mean_5 = []
-std_5 = []
-f_mean_5 = []
-f_std_5 = []
+    # Generate Cartesian product
+    combinations = product(depths, epochs, widths)
+
+    # Initialize results dictionary
+    results = {2: {'mean': [], 'std': [], 'f_mean': [], 'f_std': []},
+               5: {'mean': [], 'std': [], 'f_mean': [], 'f_std': []}}
+
+    # Loop through combinations
+    for d, e, w in combinations:
+        data = df[(df['Depth'] == d) & (df['Epochs'] == e) & (df['Width'] == w)]
+
+        # Compute mean and std for current group
+        mean_value = data['Mean'].mean()
+        std_value = data['Mean'].std()
+        f_mean_value = data['Forgetting'].mean()
+        f_std_value = data['Forgetting'].std()
+
+        print(f"d: {d}, e: {e}, w: {w} -> mean = {mean_value:.2f}, std = {std_value:.2f}")
+
+        # Check for missing seeds
+        if len(data['Seed']) != 10:
+            print(f"Missing seeds for d: {d}, e: {e}, w: {w}")
+            for mean, seed in zip(data['Mean'], data['Seed']):
+                print(f"  mean: {mean}, seed: {seed}")
+
+        # Store results by depth
+        if d in results:
+            results[d]['mean'].append(mean_value)
+            results[d]['std'].append(std_value)
+            results[d]['f_mean'].append(f_mean_value)
+            results[d]['f_std'].append(f_std_value)
+
+    # Convert lists to numpy arrays
+    for key in results.keys():
+        for metric in results[key]:
+            results[key][metric] = np.array(results[key][metric])
+
+    return results, widths
 
 
-for i, (d, e, w) in enumerate(combinations, start=1):
-    data = df[(df['Depth']==d) & (df['Epochs']==e) & (df['Width']==w)]
-    print(f"d: {d}, e: {e} and w: {w} -> mean = {data['Mean'].mean()} and std = {data['Mean'].std()}")
-    if d == 2:
-        mean_2.append(data['Mean'].mean())
-        std_2.append(data['Mean'].std())
-        f_mean_2.append(data['Forgetting'].mean())
-        f_std_2.append(data['Forgetting'].std())
-
-    else:
-        mean_5.append(data['Mean'].mean())
-        std_5.append(data['Mean'].std())
-        f_mean_5.append(data['Forgetting'].mean())
-        f_std_5.append(data['Forgetting'].std())
-
-    if len(data['Seed']) != 10:
-        print(f"d: {d}, e: {e} and w: {w}")
-        for i,j in zip(data['Mean'],data['Seed']):
-            print(f"mean: {i} and seed {j}")
-        # print(f"mean: {data['Mean']} and seed {data['Seed']}")
-
-mean_2 = np.array(mean_2)
-std_2 = np.array(std_2)
-mean_5 = np.array(mean_5)
-std_5 = np.array(std_5)
-f_mean_2 = np.array(f_mean_2)
-f_std_2 = np.array(f_std_2)
-f_mean_5 = np.array(f_mean_5)
-f_std_5 = np.array(f_std_5)
 
 # plot it!
-t = widths
+# t = widths
 # fig, ax = plt.subplots(1)
 # Create a second y-axis
 # ax2 = ax.twinx()
@@ -80,7 +81,16 @@ t = widths
 fig, axes = plt.subplots(2, 2, figsize=(12, 5))  # 1 row, 2 columns
 for i,model in enumerate(["LwF-MC","A-GEM"]):
 
+    if model == "LwF-MC":
+        results_path = "/Users/thomaszilliox/Documents/git_repos/Chimpanzees/Code/src/mammoth/results-lwfmc.csv"
+    else:
+        results_path = "/Users/thomaszilliox/Documents/git_repos/Chimpanzees/Code/src/mammoth/results-agem.csv"
+
+    results,t = get_metrics(results_path)
     # fig.suptitle(val, fontsize=12)
+
+    mean_2, std_2, f_mean_2, f_std_2 = results[2]['mean'], results[2]['std'], results[2]['f_mean'], results[2]['f_std']
+    mean_5, std_5, f_mean_5, f_std_5 = results[5]['mean'], results[5]['std'], results[5]['f_mean'], results[5]['f_std']
 
 
     model_1 = "depth: 2"
@@ -92,7 +102,7 @@ for i,model in enumerate(["LwF-MC","A-GEM"]):
     axes[i][0].fill_between(t, mean_5+std_5, mean_5-std_5, facecolor='red', alpha=0.3)
 
     # axes[0].set_title(r'Study of forgetting')
-    axes[i][0].legend(loc='upper left')
+    axes[i][0].legend()
     axes[i][0].set_xlabel('Width')
     axes[i][0].set_ylabel('$A_{T}$ [%]')
     axes[i][0].grid()
@@ -105,7 +115,8 @@ for i,model in enumerate(["LwF-MC","A-GEM"]):
     axes[i][1].fill_between(t, f_mean_5+f_std_5, f_mean_5-f_std_5, facecolor='red', alpha=0.3)
 
     # axes[1].set_title(r'Study of forgetting')
-    axes[i][1].legend(loc='upper left')
+    # axes[i][1].legend(loc='upper left')
+    axes[i][1].legend()
     axes[i][1].set_xlabel('Width')
     axes[i][1].set_ylabel('$F_{T}$ [%]')
     axes[i][1].grid()

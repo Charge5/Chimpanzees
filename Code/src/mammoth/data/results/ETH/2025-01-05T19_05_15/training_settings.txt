@@ -1,1 +1,0 @@
---datasetseq-mnist--backbonemnistmlp--modellwf-mc--lr0.01--seed9--n_epochs50--mlp_hidden_size100--mlp_hidden_depth5--enable_other_metricsTrue
