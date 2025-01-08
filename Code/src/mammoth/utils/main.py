@@ -436,9 +436,10 @@ def main(args=None):
     results_path =  os.path.join(mammoth_path, "data/results/ETH")
     file_path = os.path.join(results_path,"results4.csv")
     if run_on_colab:
-        file_path = "results10.csv"
+        file_path = "results20.csv"
     import ast
-    logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/lwf_mc/logs.pyd")
+    # logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/lwf_mc/logs.pyd")
+    logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/agem/logs.pyd")
     f = open(logs_path, "r")
     results = f.readlines()
     last_results = results[-1]
