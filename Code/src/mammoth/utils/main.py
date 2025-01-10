@@ -43,16 +43,23 @@ from utils import setup_logging
 import datetime
 setup_logging()
 
-def create_eth_dir():
+
+def get_output_dir():
+    from pathlib import Path
+    script_dir = Path(__file__).resolve().parent
+    code_dir = script_dir.parent.parent.parent
+    output_dir = os.path.join(code_dir, "Data/Output")
+    return output_dir
+def create_model_dir():
     current_time = datetime.datetime.now().isoformat()
     current_time = current_time.replace(":", "_").split(".")[0]
-    eth_output_path = os.path.join(mammoth_path, "data/results/ETH")
-    if not os.path.exists(eth_output_path):
-        os.mkdir(eth_output_path)
-    eth_output_path = os.path.join(eth_output_path, current_time)
-    logging.info(f"Creating {eth_output_path}")
-    os.mkdir(eth_output_path)
-    return eth_output_path
+    model_output_path = os.path.join(get_output_dir(), "models")
+    if not os.path.exists(model_output_path):
+        os.mkdir(model_output_path)
+    model_output_path = os.path.join(model_output_path, current_time)
+    logging.info(f"Creating {model_output_path}")
+    os.mkdir(model_output_path)
+    return model_output_path
 
 
 if __name__ == '__main__':
@@ -405,7 +412,9 @@ def main(args=None):
     except Exception:
         pass
 
-    eth_output_path = create_eth_dir()
+
+
+    eth_output_path = create_model_dir()
 
     training_settings = open(os.path.join(eth_output_path,"training_settings.txt"),"w")
     # training_settings.write(sys.argv[:])
@@ -434,12 +443,21 @@ def main(args=None):
 
     # Example usage
     results_path =  os.path.join(mammoth_path, "data/results/ETH")
-    file_path = os.path.join(results_path,"results4.csv")
-    if run_on_colab:
-        file_path = "results20.csv"
+
+
+
+
+    file_path = os.path.join(get_output_dir(),f"results-{args.model}.csv")
+
+
     import ast
-    # logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/lwf_mc/logs.pyd")
-    logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/agem/logs.pyd")
+
+    logs_path = ""
+    if args.model == "agem":
+        logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/agem/logs.pyd")
+    elif args.model == "lwf_mc":
+        logs_path = os.path.join(mammoth_path, "data/results/class-il/seq-mnist/lwf_mc/logs.pyd")
+
     f = open(logs_path, "r")
     results = f.readlines()
     last_results = results[-1]
@@ -458,3 +476,6 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
+
+

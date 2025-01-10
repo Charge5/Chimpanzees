@@ -82,7 +82,7 @@ fig, axes = plt.subplots(2, 2, figsize=(12, 5))  # 1 row, 2 columns
 for i,model in enumerate(["LwF-MC","A-GEM"]):
 
     if model == "LwF-MC":
-        results_path = "/Code/Data/impact_of_hyperparameters/results-lwfmc.csv"
+        results_path = "/Code/Data/impact_of_hyperparameters/results-lwf_mc.csv"
     else:
         results_path = "/Code/Data/impact_of_hyperparameters/results-agem.csv"
 

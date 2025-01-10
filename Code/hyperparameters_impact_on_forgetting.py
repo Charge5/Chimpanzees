@@ -2,8 +2,8 @@
 This is the script used for the figure of chapter 3.
 
 This script will anaylze (post-process) and plot the  Impact of hyperparameters on forgetting. In order
-to use that script you will need to have run the script (...) or notebook (...) in order to have generate the
-two files "results-agem.csv" and "results-lwfmc.csv".
+to use that script you will need to have run the scripts "bulk_run_agem_hiof.py" and "bulk_run_lwfmc_hiof"
+in order to have generate the two files "results-agem.csv" and "results-lwf_mc.csv".
 '''
 
 import  pandas as pd
@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from itertools import product
 import  numpy as np
 import os
+from pathlib import Path
 
 def get_metrics(results_path):
     df = pd.read_csv(results_path)
@@ -73,11 +74,10 @@ def get_metrics(results_path):
 def generate_plots():
     fig, axes = plt.subplots(2, 2, figsize=(12, 5))  # 1 row, 2 columns
     for i,model in enumerate(["LwF-MC","A-GEM"]):
-        root_dir = os.getcwd()
-        print(root_dir)
-        results_dir = os.path.join(root_dir,"Data/impact_of_hyperparameters/")
+        script_dir = Path(__file__).resolve().parent
+        results_dir = os.path.join(script_dir,"Data/impact_of_hyperparameters/")
         if model == "LwF-MC":
-            results_path = os.path.join(results_dir,"results-lwfmc.csv")
+            results_path = os.path.join(results_dir,"results-lwf_mc.csv")
         elif model == "A-GEM":
             results_path = os.path.join(results_dir, "results-agem.csv")
         else:
