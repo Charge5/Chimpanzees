@@ -82,9 +82,9 @@ fig, axes = plt.subplots(2, 2, figsize=(12, 5))  # 1 row, 2 columns
 for i,model in enumerate(["LwF-MC","A-GEM"]):
 
     if model == "LwF-MC":
-        results_path = "/Users/thomaszilliox/Documents/git_repos/Chimpanzees/Code/src/mammoth/results-lwfmc.csv"
+        results_path = "/Code/Data/impact_of_hyperparameters/results-lwfmc.csv"
     else:
-        results_path = "/Users/thomaszilliox/Documents/git_repos/Chimpanzees/Code/src/mammoth/results-agem.csv"
+        results_path = "/Code/Data/impact_of_hyperparameters/results-agem.csv"
 
     results,t = get_metrics(results_path)
     # fig.suptitle(val, fontsize=12)
