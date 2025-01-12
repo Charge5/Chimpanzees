@@ -60,6 +60,16 @@ Each experiment corresponds to one python script. To reproduce an experiment, yo
   python regions_and_accuracy.py
   ```
   This will run the experiment for a depth 2 width 70 MLP using the LwF-MC algorithm. Again you can modify the parameters by editing the 'params' dictionnary in the .py file.
+- To run the eperiment described in Chapter 3 "Impact of depth and width on forgetting", you will need to run:
+  ```commandline
+  python bulk_run_agem_hiof.py
+  python bulk_run_lwfmc_hiof.py
+  ```
+  The setup used for the experience, i.e. the different hyperparameters, are already defined in the script. Keep in mind that running those
+  scripts might takes some days. When the different runs are done, run the following script to generate the plots:
+  ```commandline
+  python hyperparameters_impact_on_forgetting.py
+  ```
 
 When running all the above experiments, the results and logs will be saved in a directory with the same name as the experiment script.
 For example the results of the experiment [`replication_paper.py`](./Code/replication_paper.py) are saved in the directory [`replication_paper`](./Code/replication_paper) located at
