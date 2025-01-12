@@ -1,6 +1,6 @@
 '''
-This is the script used to generate the A-GEM data of the figure of chapter 3.
-This script is required to generate the data for the script "hyperparameters_impact_on_forgetting.py"
+This is the script used to generate the A-GEM data of the figure of appendix C.
+This script is required to generate the data for the script "epochs_impact_on_algorith.py"
 '''
 
 import subprocess
@@ -35,16 +35,10 @@ def run_command(command: str):
 if __name__ == "__main__":
     print("Start multiple run...")
 
-    learning_rates = [0.001]
-    depth = [2, 5, 10]
-    width = [5, 10, 15, 20, 50, 75, 100]
-    epochs = 50
-    seed = [x for x in range(0, 10, 1)]
-
     learning_rates = [0.01]
     depth = [10]
     width = [5]
-    epochs = [25,75,100]
+    epochs = [25,50,75,100]
     seed = 0
 
     # Generate Cartesian product

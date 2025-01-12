@@ -1,6 +1,6 @@
 '''
-This is the script used to generate the A-GEM data of the figure of chapter 3.
-This script is required to generate the data for the script "hyperparameters_impact_on_forgetting.py"
+This is the script used to generate the A-GEM data of the figure of appendix C.
+This script is required to generate the data for the script "epochs_impact_on_algorith.py"
 '''
 
 import subprocess
