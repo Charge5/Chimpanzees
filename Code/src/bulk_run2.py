@@ -42,6 +42,7 @@ if __name__ == "__main__":
     epochs = [50]
     seed = [x for x in range (0,10,1)]
     seed = [x for x in range(0, 5, 1)]
+    seed = [9,10]
 
     # Generate Cartesian product
     combinations = list(product(learning_rates, seed, depth, width))

@@ -17,6 +17,7 @@ from typing import Iterable, Tuple
 import logging
 import torch
 from tqdm import tqdm
+import json
 
 from datasets import get_dataset
 from datasets.utils.continual_dataset import ContinualDataset, MammothDatasetWrapper
@@ -230,7 +231,7 @@ def train_single_epoch(model: ContinualModel,
 
 
 def train(model: ContinualModel, dataset: ContinualDataset,
-          args: Namespace,eth_path = None) -> None:
+          args: Namespace,eth_path = None, save_within_tasks=False) -> None:
     """
     The training process, including evaluations and loggers.
 
@@ -240,6 +241,13 @@ def train(model: ContinualModel, dataset: ContinualDataset,
         args: the arguments of the current execution
     """
     print(args)
+    if save_within_tasks:
+        saving_times = [0, 1, 2, 5, 10, 25, 40, 45, 48, 49]
+    elif args.save_accuracy_within_tasks:
+        saving_times = [0, 1, 2, 5, 10, 25, 40, 45, 48, 49]
+        accuracy = {}
+    else:
+        saving_times = []
 
     is_fwd_enabled = True
     can_compute_fwd_beforetask = True
@@ -334,6 +342,12 @@ def train(model: ContinualModel, dataset: ContinualDataset,
 
                 scheduler = get_scheduler(model, args, reload_optim=True) if not hasattr(model, 'scheduler') else model.scheduler
 
+                if save_within_tasks:
+                    model_file = os.path.join(eth_path, f"model_task_{t+1}_epoch_{0}.pt")
+                    torch.save(model, model_file)
+                if args.save_accuracy_within_tasks:
+                    epoch_accs = evaluate(model, eval_dataset)
+                    accuracy[f"task_{t+1}_epoch_{0}"] = epoch_accs[0]
                 epoch = 0
                 best_ea_metric = None
                 best_ea_model = None
@@ -349,6 +363,12 @@ def train(model: ContinualModel, dataset: ContinualDataset,
                                        system_tracker=system_tracker, data_len=data_len, scheduler=scheduler)
 
                     model.end_epoch(epoch, dataset)
+                    if save_within_tasks and (epoch+1 in saving_times):
+                        model_file = os.path.join(eth_path, f"model_task_{t+1}_epoch_{epoch+1}.pt")
+                        torch.save(model, model_file)
+                    if args.save_accuracy_within_tasks and (epoch+1 in saving_times):
+                        epoch_accs = evaluate(model, eval_dataset)
+                        accuracy[f"task_{t+1}_epoch_{epoch+1}"] = epoch_accs[0]
 
                     epoch += 1
                     if args.fitting_mode == 'epochs' and epoch >= model.args.n_epochs:
@@ -428,9 +448,10 @@ def train(model: ContinualModel, dataset: ContinualDataset,
                     torch.save(save_obj, checkpoint_name)
 
             # Save the model (or do direct analysis)
-            model_file = os.path.join(eth_path,f"model_task_{t+1}.pt")
+            if not save_within_tasks:
+                model_file = os.path.join(eth_path,f"model_task_{t+1}.pt")
             # torch.save(model.state_dict(), model_file)
-            torch.save(model, model_file)
+                torch.save(model, model_file)
 
             # if run_on_colab :
             #     from google.colab import files
@@ -462,6 +483,12 @@ def train(model: ContinualModel, dataset: ContinualDataset,
             # print(f"Number of regions: {len(regions)}")
 
             # f = open(model_file, "w")
+
+        if args.save_accuracy_within_tasks:
+            with open(eth_path + "/accuracy.json", "w") as f:
+                json.dump(accuracy, f, indent=4)
+        #f = open(eth_path + "/accuracy.json", "w")
+        #f.write(str(accuracy))
 
         if args.validation:
             # Final evaluation on the real test set
