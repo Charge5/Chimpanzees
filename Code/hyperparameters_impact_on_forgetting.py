@@ -2,7 +2,7 @@
 This is the script used for the figure of chapter 3.
 
 This script will anaylze (post-process) and plot the  Impact of hyperparameters on forgetting. In order
-to use that script you will need to have run the scripts "bulk_run_agem_hiof.py" and "bulk_run_lwfmc_hiof"
+to use that script you will need to have run the scripts "bulk_run_agem_hiof.py" and "bulk_run_lwfmc_hiof.py"
 in order to have generate the two files "results-agem.csv" and "results-lwf_mc.csv".
 '''
 
