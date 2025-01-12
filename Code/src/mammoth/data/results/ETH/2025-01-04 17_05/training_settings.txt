@@ -1,1 +1,0 @@
---datasetseq-mnist--backbonemnistmlp--modelagem--lr0.001--seed5--n_epochs50--mlp_hidden_size20--mlp_hidden_depth2--save_models_within_tasksTrue--buffer_size500
