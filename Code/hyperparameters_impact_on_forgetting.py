@@ -72,7 +72,7 @@ def get_metrics(results_path):
     return results, widths
 
 def generate_plots():
-    fig, axes = plt.subplots(2, 2, figsize=(12, 5))  # 1 row, 2 columns
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))  # 1 row, 2 columns
     for i,model in enumerate(["LwF-MC","A-GEM"]):
         script_dir = Path(__file__).resolve().parent
         results_dir = os.path.join(script_dir,"Data/impact_of_hyperparameters/")

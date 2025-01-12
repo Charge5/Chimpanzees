@@ -41,15 +41,21 @@ if __name__ == "__main__":
     epochs = 50
     seed = [x for x in range(0, 10, 1)]
 
+    learning_rates = [0.01]
+    depth = [10]
+    width = [5]
+    epochs = [25,75,100]
+    seed = 0
+
     # Generate Cartesian product
-    combinations = list(product(learning_rates, seed, depth, width))
+    combinations = list(product(learning_rates, epochs, depth, width))
     total_combinations = len(combinations)
 
-    for i, (lr, s, d, w) in enumerate(combinations, start=1):
-        print(f"Iteration {i}/{total_combinations} - Learning rate: {lr}, Epochs: {epochs}, Depth: {d}, Width: {w}, Seed: {s}")
+    for i, (lr, e, d, w) in enumerate(combinations, start=1):
+        print(f"Iteration {i}/{total_combinations} - Learning rate: {lr}, Epochs: {e}, Depth: {d}, Width: {w}, Seed: {seed}")
         start_time = time.time()  # Start timing
         main_path = os.path.join(Path(__file__).resolve().parent,"src/mammoth/utils/main.py")
-        cmd = f"python {main_path} --dataset seq-mnist --backbone mnistmlp --model agem --buffer_size 500 --lr {lr} --seed {s} --n_epochs {epochs} --mlp_hidden_size {w} --mlp_hidden_depth {d} --enable_other_metrics True"
+        cmd = f"python {main_path} --dataset seq-mnist --backbone mnistmlp --model lwf-mc  --lr {lr} --seed {seed} --n_epochs {e} --mlp_hidden_size {w} --mlp_hidden_depth {d} --enable_other_metrics True --device 0"  # Replace with your desired command
         run_command(cmd)
         end_time = time.time()  # Start timing
         elapsed_time = end_time - start_time
