@@ -106,12 +106,12 @@ def generate_plots():
         axes[i][0].fill_between(t, mean_10 + std_10, mean_10 - std_10, facecolor='green', alpha=0.3)
 
         # axes[0].set_title(r'Study of forgetting')
-        axes[i][0].legend()
-        axes[i][0].set_xlabel('Width')
-        axes[i][0].set_ylabel('$A_{5}$ [%]')
+        axes[i][0].legend(fontsize=16)
+        axes[i][0].set_xlabel('Width',fontsize=16)
+        axes[i][0].set_ylabel('$A_{5}$ [%]',fontsize=16)
         axes[i][0].grid()
 
-        axes[i][0].set_title(f"{model} average accuracy")
+        axes[i][0].set_title(f"{model} average accuracy",fontsize=16)
 
         axes[i][1].plot(t, f_mean_2, lw=2, label=model_1, color='blue')
         axes[i][1].plot(t, f_mean_5, lw=2, label=model_2, color='red')
@@ -122,12 +122,12 @@ def generate_plots():
 
         # axes[1].set_title(r'Study of forgetting')
         # axes[i][1].legend(loc='upper left')
-        axes[i][1].legend()
-        axes[i][1].set_xlabel('Width')
-        axes[i][1].set_ylabel('$F_{5}$ [%]')
+        axes[i][1].legend(fontsize=16)
+        axes[i][1].set_xlabel('Width',fontsize=16)
+        axes[i][1].set_ylabel('$F_{5}$ [%]',fontsize=16)
         axes[i][1].grid()
 
-        axes[i][1].set_title(f"{model} forgetting")
+        axes[i][1].set_title(f"{model} forgetting",fontsize=16)
 
     plt.tight_layout()
     plt.show()

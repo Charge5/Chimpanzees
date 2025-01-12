@@ -60,13 +60,13 @@ Each experiment corresponds to one python script. To reproduce an experiment, yo
   python regions_and_accuracy.py
   ```
   This will run the experiment for a depth 2 width 70 MLP using the LwF-MC algorithm. Again you can modify the parameters by editing the 'params' dictionnary in the .py file.
-- To run the eperiment described in Chapter 3 "Impact of depth and width on forgetting", you will need to run:
+- To run the experiment described in Chapter 3 "Impact of depth and width on forgetting", you will need to run:
   ```commandline
   python bulk_run_agem_hiof.py
   python bulk_run_lwfmc_hiof.py
   ```
   The setup used for the experience, i.e. the different hyperparameters, are already defined in the script. Keep in mind that running those
-  scripts might takes some days. When the different runs are done, run the following script to generate the plots:
+  scripts might take some days. When the different runs are done, run the following script to generate the plots:
   ```commandline
   python hyperparameters_impact_on_forgetting.py
   ```
@@ -97,6 +97,8 @@ As a first try, we also implemented the counting method based on sampling the in
 The public repository Mammoth, publicly available at https://github.com/aimagelab/mammoth, is integrated in ours. The only modifications done to Mammoth are the following:
 - Modified the `main.py` and `train.py` scripts to save the model after each task (always) and within each task at different epochs via the parameter `--save_model_within_tasks True` (optional). This was useful to then load each model and count the number of regions.  
 - We further modified `main.py` and `train.py` via the parameter `--save_accuracy_within_tasks True` (optional). This was useful to save the model's accuracy within each task and not only after each task. 
+- modify models for width chage ...
+- We implemented a "bulk run" feature that allows `main.py` to be executed multiple times with different hyperparameters. The outputs from these runs are stored in the `./Code/Data/Output` directory, which is included in the .gitignore list.
 
 ### Mammoth for dummies
 
