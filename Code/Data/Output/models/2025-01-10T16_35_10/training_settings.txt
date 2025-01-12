@@ -1,0 +1,1 @@
+--datasetseq-mnist--backbonemnistmlp--modelagem--buffer_size500--lr0.001--seed0--n_epochs25--mlp_hidden_size5--mlp_hidden_depth10--enable_other_metricsTrue
