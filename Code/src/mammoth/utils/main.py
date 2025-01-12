@@ -42,14 +42,13 @@ sys.path.append(mammoth_path + '/models')
 from utils import setup_logging
 import datetime
 setup_logging()
-
-
 def get_output_dir():
     from pathlib import Path
     script_dir = Path(__file__).resolve().parent
     code_dir = script_dir.parent.parent.parent
     output_dir = os.path.join(code_dir, "Data/Output")
     return output_dir
+
 def create_model_dir():
     current_time = datetime.datetime.now().isoformat()
     current_time = current_time.replace(":", "_").split(".")[0]
@@ -60,6 +59,19 @@ def create_model_dir():
     logging.info(f"Creating {model_output_path}")
     os.mkdir(model_output_path)
     return model_output_path
+def create_eth_dir(with_seconds=True):
+    if with_seconds:
+        current_time = datetime.datetime.now().isoformat()
+    else:
+        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+    current_time = current_time.replace(":", "_").split(".")[0]
+    eth_output_path = os.path.join(mammoth_path, "data/results/ETH")
+    if not os.path.exists(eth_output_path):
+        os.mkdir(eth_output_path)
+    eth_output_path = os.path.join(eth_output_path, current_time)
+    logging.info(f"Creating {eth_output_path}")
+    os.mkdir(eth_output_path)
+    return eth_output_path
 
 
 if __name__ == '__main__':
@@ -186,7 +198,8 @@ def parse_args():
     add_initial_args(parser)
     args = parser.parse_known_args()[0]
     parser.add_argument("--mlp_hidden_depth", type=int, required=False, help="Size of the input layer")
-
+    parser.add_argument("--save_models_within_tasks", type=bool, required=False, help="Save the models at specific epochs during training")
+    parser.add_argument("--save_accuracy_within_tasks", type=bool, required=False, help="Save the accuracy at specific epochs during training")
 
     if args.backbone is None:
         logging.warning('No backbone specified. Using default backbone (set by the dataset).')
@@ -412,9 +425,12 @@ def main(args=None):
     except Exception:
         pass
 
+    
+    if args.save_models_within_tasks or args.save_accuracy_within_tasks:
+        eth_output_path = create_eth_dir(with_seconds=False)
+    else:
+        eth_output_path = create_model_dir()
 
-
-    eth_output_path = create_model_dir()
 
     training_settings = open(os.path.join(eth_output_path,"training_settings.txt"),"w")
     # training_settings.write(sys.argv[:])
@@ -422,9 +438,10 @@ def main(args=None):
         training_settings.write(i)
     training_settings.close()
 
-    train(model, dataset, args,eth_output_path)
-
-
+    if args.save_models_within_tasks:
+        train(model, dataset, args,eth_output_path, save_within_tasks=True)
+    else:
+        train(model, dataset, args,eth_output_path, save_within_tasks=False)
 
     def append_to_csv(file_path, data, headers=None):
         # Check if the file exists

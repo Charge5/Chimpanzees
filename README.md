@@ -21,29 +21,80 @@ When done install the [requirements.txt](./requirements.txt) from the main direc
 pip install -r requirements.txt
 ```
 
-To run mammoth, first go to the following directory: 
+## How to run Mammoth?  
+First go to the following directory: 
 ```
 cd ./Code/src/mammoth
 ```
 
-Then run:
+Then run for example:
 ```
-python utils/main.py --dataset seq-mnist --backbone mnistmlp --model lwf --lr 0.01 --seed 42
+python utils/main.py --dataset seq-mnist --backbone mnistmlp --model lwf-mc --lr 0.01 --seed 42 --n_epochs 50 --mlp_hidden_size 100 --mlp_hidden_depth 2
 
 ```
+The above use mammoth to train an MLP model of depth 2, width 100 on the sequential MNIST dataset using the LwF-MC algorithm.  
+If you want to use another model, e.g. A-GEM, just change the '--model' parameter and add the required parameters for this model (for A-GEM, the buffer size is required).
 
-However it was noticed that with lwf the MLP can not generalize accross the different tasks but the following command can:
 ```
-python utils/main.py --dataset seq-mnist --backbone mnistmlp --model agem --lr 0.01 --seed 42 --n_epochs 2 --buffer_size 256
+python utils/main.py --dataset seq-mnist --backbone mnistmlp --model agem --lr 0.01 --seed 42 --n_epochs 50 --mlp_hidden_size 100 --mlp_hidden_depth 2 --buffer_size 500
 ```
 
-## Mammoth for dummies
+## How to run the experiments?
+To run the experiments, first go to the 'Code' directory:
+```
+cd ./Code
+```
+Each experiment corresponds to one python script. To reproduce an experiment, you just need to run the corresponding script. A description of the experiment is always given in the experiment script.  
+- To run the experiment reproducing Figure 3 of https://arxiv.org/abs/1906.00904, run the following command
+  ```
+  python replication_paper.py
+  ```
+  This will run the experiment for a depth 4 width 16 MLP. To modify the size, you can directly edit the 'params' dictionnary in the .py file.
+- To run the experiment where we count the number of activation regions of a model trained via continuous learning, run the following command
+  ```
+  python count_regions_during_CL.py
+  ```
+  This will run the experiment for a depth 2 width 20 MLP using the LwF-MC algorithm. To modify the size, model, learning rate and other parameters you can directly edit the 'params' dictionnary in the .py file.
+- To run the experiment where we relate the number of activation regions to the accuracy of each task, you can run the following command
+  ```
+  python regions_and_accuracy.py
+  ```
+  This will run the experiment for a depth 2 width 70 MLP using the LwF-MC algorithm. Again you can modify the parameters by editing the 'params' dictionnary in the .py file.
+
+When running all the above experiments, the results and logs will be saved in a directory with the same name as the experiment script.
+For example the results of the experiment [`replication_paper.py`](./Code/replication_paper.py) are saved in the directory [`replication_paper`](./Code/replication_paper) located at
+```
+cd ./Code/replication_paper
+```
+
+## How the plots were created?
+We ran all the above experiments and the results are availble in the corresponding directories. The final plots available in our report are then created by the notebook [`generate_figures.ipynb`](./Code/generate_figures.ipynb) located at
+```
+cd ./Code/generate_figures.ipynb
+```
+This notebook simply loads the results saved during the experiments and build the corresponding plot.  
+
+
+## More details about the repository
+
+### Software contributions
+The main software contribution in our repository is the package [`activationregion`](./Code/src/activationregion) located at `./Code/src/activationregion`.  
+It contains the function `exact_count_2D`, available at [`activationregion/core`](./Code/src/activationregion/core), our implementation of the exact counting of the number of activation regions, outlined in https://arxiv.org/abs/1906.00904.  
+
+As a first try, we also implemented the counting method based on sampling the input space, e.g. described in https://arxiv.org/abs/1802.08760, but we didn't use it for our experiments as we prefer to have the exact number of activation regions. This function is `sample_count_2D` and is still availble in [`activationregion/core`](./Code/src/activationregion/core).
+
+### Mammoth
+The public repository Mammoth, publicly available at https://github.com/aimagelab/mammoth, is integrated in ours. The only modifications done to Mammoth are the following:
+- Modified the `main.py` and `train.py` scripts to save the model after each task (always) and within each task at different epochs via the parameter `--save_model_within_tasks True` (optional). This was useful to then load each model and count the number of regions.  
+- We further modified `main.py` and `train.py` via the parameter `--save_accuracy_within_tasks True` (optional). This was useful to save the model's accuracy within each task and not only after each task. 
+
+### Mammoth for dummies
 
 * Model: Model of continous learning
 * Backbone: Network used for the training
 * Dataset: Dataset used for the training for example mnist
 
-### What does the results mean?
+### What do the results mean?
 
 #### 0. [Class-IL] (Class Incremental Learning):
 * In Class Incremental Learning, the model is evaluated on all classes encountered so far without access to task identifiers.

@@ -3,7 +3,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 
-def plot_regions_exact(regions, with_points=True):
+def plot_regions_exact(regions, with_points=True, labels=None):
     color_set = [
         "blue", "green", "yellow", "orange", "red", "purple", "cyan", "magenta",
         "brown", "pink", "lime", "teal", "navy", "gold", "silver", "gray",
@@ -16,9 +16,19 @@ def plot_regions_exact(regions, with_points=True):
         plt.fill(vertices[:, 0], vertices[:, 1], color=color, alpha=1)
 
     if with_points:
-        plt.scatter(0, 0, c='black')
-        plt.scatter(-1, 0, c='black')
-        plt.scatter(0, -1, c='black')
+        x = [0, -1, 0]
+        y = [0, 0, -1]
+        plt.scatter(x, y, color='white')
+        #plt.scatter(0, 0, c='white')
+        #plt.scatter(-1, 0, c='white')
+        #plt.scatter(0, -1, c='white')
+        if labels is not None:
+            for i, label in enumerate(labels):
+                plt.text(x[i], y[i], label, fontsize=12, ha='center', va='center',
+             bbox=dict(boxstyle="round,pad=0.3", edgecolor="black", facecolor="white"))
+
+    plt.axis('off')
+    plt.tight_layout()
     return fig
 
 def plot_regions_sample(inverse_indices, x1, x2, n_samples, with_points=True):
