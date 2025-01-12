@@ -13,6 +13,7 @@ from itertools import product
 import  numpy as np
 import os
 from pathlib import Path
+import ast
 
 def get_metrics(results_path):
     df = pd.read_csv(results_path)
@@ -44,11 +45,10 @@ def get_metrics(results_path):
     # Return the results and widths (required for the x-axis)
     return results, widths
 
-import ast
-def generate_plots():
-    fig, axes = plt.subplots(2, 2, figsize=(12, 8))  # 1 row, 2 columns
-    # for i,model in enumerate(["LwF-MC","A-GEM"]):
-    for i, model in enumerate(["A-GEM"]):
+def generate_plots_classes():
+    # fig, axes = plt.subplots(2, 2, figsize=(12, 8))  # 1 row, 2 columns
+    for i,model in enumerate(["LwF-MC","A-GEM"]):
+    # for i, model in enumerate(["A-GEM"]):
         script_dir = Path(__file__).resolve().parent
         results_dir = os.path.join(script_dir,"Data/impact_of_hyperparameters/")
         if model == "LwF-MC":
@@ -59,19 +59,6 @@ def generate_plots():
             results_path = ""
             # Throw an error for unknown model
             pass
-
-        # df = pd.read_csv(results_path)
-        # end_accuracy = df['Mean_array']
-        #
-        #
-        # end_accuracy = end_accuracy.apply(ast.literal_eval)
-        # end_accuracy['Mean'] = df['Mean']
-        # # Append the value from 'Value_to_add' to each list in 'Mean_array'
-        # end_accuracy['Mean_array'] = end_accuracy.apply(
-        #     lambda row: row['Mean_array'] + [row['Value_to_add']], axis=1
-        # )
-        import pandas as pd
-        import ast
 
         # Load the data
         df = pd.read_csv(results_path)
@@ -86,14 +73,6 @@ def generate_plots():
         )
         print(df[['Epochs','Mean_array']])
 
-        data = {
-            "Epochs": [1, 2, 3],
-            "Mean_array": [[0.8, 0.75, 0.78, 0.82, 0.79, 0.81],
-                           [0.85, 0.80, 0.83, 0.87, 0.84, 0.86],
-                           [0.88, 0.83, 0.86, 0.90, 0.87, 0.89]]
-        }
-        df2 = pd.DataFrame(data)
-        print(df2)
         # Print the updated DataFrame
         # Set legend labels
         legend_labels = ['task 1', 'task 2', 'task 3', 'task 4', 'task 5', 'mean']
@@ -107,14 +86,27 @@ def generate_plots():
 
         # Plot each task's data
         for i in range(len(legend_labels)):
-            task_values = [row[i] for row in df['Mean_array']]
-            ax.bar(x + i * width, task_values, width, label=legend_labels[i])
+            task_values = [row[i] + 0.001 for row in df['Mean_array']]
+            # ax.bar(x + i * width, task_values, width, label=legend_labels[i])
+            bars = ax.bar(x + i * width, task_values, width, label=legend_labels[i])
+            print(task_values)
 
+            # Add values on top of the bars
+            for bar in bars:
+                height = bar.get_height()
+                print(height)
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2,  # x position
+                    height,  # y position
+                    f'{height:.2f}',  # text (formatted to 2 decimal places)
+                    ha='center',  # horizontal alignment
+                    va='bottom'  # vertical alignment
+                )
 
         # Add labels, title, and legend
-        ax.set_xlabel('Epoch')
-        ax.set_ylabel('Values')
-        ax.set_title('Grouped Bar Chart of Mean Array per Epoch')
+        ax.set_xlabel('Epochs')
+        ax.set_ylabel('Average accuracy [%]')
+        # ax.set_title('Grouped Bar Chart of Mean Array per Epoch')
         ax.set_xticks(x + width * (len(legend_labels) - 1) / 2)
         ax.set_xticklabels(df['Epochs'])
         ax.legend(title="Metrics")
@@ -126,20 +118,36 @@ def generate_plots():
         plt.tight_layout()
         plt.show()
 
-        # print(end_accuracy)
-
-
-
-
-        # array =
-        # print(type(array[0]))
-
-
-
 
 
     # plt.tight_layout()
     # plt.show()
 
+def generate_plots_forgetting():
+    script_dir = Path(__file__).resolve().parent
+    results_dir = os.path.join(script_dir, "Data/impact_of_hyperparameters/")
+    results_path = os.path.join(results_dir, "results-lwf_mc-appendix.csv")
+    df_lwf = pd.read_csv(results_path)
+
+    results_path = os.path.join(results_dir, "results-agem-appendix.csv")
+    df_agem = pd.read_csv(results_path)
+
+    df = pd.DataFrame()
+
+    df.insert(0, 'epochs', df_lwf['Epochs'])
+    df.insert(1, 'lwf_f', df_lwf['Forgetting'])
+    df.insert(2, 'agem_f', df_agem['Forgetting'])
+
+    plt.plot(df['epochs'],df['lwf_f'],label="LwF-MC",marker='o')
+    plt.plot(df['epochs'], df['agem_f'],label="A-GEM",marker='o')
+
+    plt.xlabel("Epochs")
+    plt.ylabel("Forgetting [%]")
+
+    plt.tight_layout()
+    plt.legend()
+    plt.show()
+
 if __name__ == "__main__":
-    generate_plots()
+    generate_plots_classes()
+    generate_plots_forgetting()
