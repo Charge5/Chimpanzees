@@ -26,23 +26,40 @@ To run the experiments, first go to the 'Code' directory:
 ```
 cd ./Code
 ```
-Each experiment corresponds to one python script. To reproduce an experiment, you just need to run the corresponding script. A description of the experiment is always given in the experiment script.  
-#### Experiments corresponding to Section 4 and Appendix A
-- To run the experiment reproducing Figure 3 of https://arxiv.org/abs/1906.00904, run the following command
+Each experiment corresponds to one python script. To reproduce an experiment, you just need to run the corresponding script. A description of the experiment is always given in the experiment script.
+
+#### Experiments corresponding to Figure 1
+- To run the experiment corresponding to Figure 1, you will need to run:
+  ```commandline
+  python bulk_run_agem_hiof.py
+  python bulk_run_lwfmc_hiof.py
   ```
-  python replication_paper.py
+  The setup used for the experience, i.e. the different hyperparameters, are already defined in the script.  
+  When the two runs are done, run the following script to generate the plots:
+  ```commandline
+  python hyperparameters_impact_on_forgetting.py
   ```
-  This will run the experiment for a depth 4 width 16 MLP. To modify the size, you can directly edit the 'params' dictionnary in the .py file.
-- To run the experiment where we count the number of activation regions of a model trained via continuous learning, run the following command
+
+#### Experiments corresponding to Figure 2 to 5
+- To run the experiment corresponding to Figure 2, run the following command
   ```
   python count_regions_during_CL.py
   ```
   This will run the experiment for a depth 2 width 20 MLP using the LwF-MC algorithm. To modify the size, model, learning rate and other parameters you can directly edit the 'params' dictionnary in the .py file.
-- To run the experiment where we relate the number of activation regions to the accuracy of each task, you can run the following command
+- To run the experiment corresponding to Figure 3, run the following command
   ```
   python regions_and_accuracy.py
   ```
   This will run the experiment for a depth 2 width 70 MLP using the LwF-MC algorithm. Again you can modify the parameters by editing the 'params' dictionnary in the .py file.
+- To run the experiment corresponding to Figure 4, run the following command
+  ```
+  python replication_paper.py
+  ```
+  This will run the experiment for a depth 4 width 16 MLP. To modify the size, you can directly edit the 'params' dictionnary in the .py file.
+- To run the experiment corresponding to Figure 5, run the following command
+  ```
+  python regions_density_after_tasks.py
+  ```
 
 When running all the above experiments, the results and logs will be saved in a directory with the same name as the experiment script.
 For example the results of the experiment [`replication_paper.py`](./Code/replication_paper.py) are saved in the directory [`replication_paper`](./Code/replication_paper) located at
@@ -55,18 +72,6 @@ The final plots available in our report are then created by the notebook [`gener
 cd ./Code/generate_figures.ipynb
 ```
 This notebook simply loads the results saved during the experiments and build the corresponding plot.
-
-#### Experiments corresponding to Section 3
-- To run the experiment described in Chapter 3 "Impact of depth and width on forgetting", you will need to run:
-  ```commandline
-  python bulk_run_agem_hiof.py
-  python bulk_run_lwfmc_hiof.py
-  ```
-  The setup used for the experience, i.e. the different hyperparameters, are already defined in the script.  
-  When the two runs are done, run the following script to generate the plots:
-  ```commandline
-  python hyperparameters_impact_on_forgetting.py
-  ```
 
 We ran all the experiments locally. The running time goes from a few minutes to around 50 hours, mainly because experiments are averaged over 10 independent runs.
 
