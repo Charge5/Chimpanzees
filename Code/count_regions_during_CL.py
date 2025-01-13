@@ -19,7 +19,7 @@ from utils_for_experiments import create_dir, setup_logging, save_params, run_co
 #       continual learning.
 # OUTPUT: Results, logs and plot will be saved in the folder 'Code/counting_regions_during_CL'.
 
-# DETAILS: This script runs mammoth on an MLP model. Mammoth will save the model at different
+# DETAILS: This script runs mammoth on a MLP model. Mammoth will save the model at different
 # epochs during training. We then load the saved models and count the number of activation
 # regions.
 
@@ -98,11 +98,11 @@ params = {
     'n_experiment': 10,   # Number of independent runs
     'n_planes': 5,      # Number of planes over which the regions are counted and averaged
     'init_vertices': [[-500, -500], [-500, 500], [500, 500], [500, -500]],  # Vertices of the initial region
-    'lr': 0.001,
+    'lr': 0.01,
     'n_epochs': 50,
-    'mlp_hidden_size': 70,
+    'mlp_hidden_size': 20,
     'mlp_hidden_depth': 2,
-    'model': 'agem',
+    'model': 'lwf-mc',
     'info': {}
 }
 

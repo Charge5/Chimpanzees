@@ -22,10 +22,10 @@ torch.manual_seed(0)
 
 # DETAILS: Since the method to count the number of activation regions was only 
 # outlined in the above paper, we consider this experiment as a validation tool 
-# for our implementation. This script trains different MLP model on MNIST dataset and 
-# counts the number of activation regions during training. We give special attention 
-# to the number of activation regions at initizialization as Theorem 5 of above paper
-# gives a probablistic upper bound.
+# for our implementation. This script trains a MLP model on MNIST dataset and 
+# counts the number of activation regions at several epochs during training. We give 
+# special attention to the number of activation regions at initizialization as Theorem 5 
+# of above paper gives a probablistic upper bound.
 
 ### ------------- UTILS, SEE BELOW FOR THE EXPERIMENT -------------- ###
 
@@ -186,8 +186,8 @@ dir_path = create_dir()
 params = {
     'n_experiment': 10,   # Number of independent runs
     'n_planes': 5,        # Number of planes over which the regions are counted and averaged
-    'width': 40,
-    'depth': 3,
+    'width': 16,
+    'depth': 4,
     'image_size': image_size,
     'lr': 0.001,
     'n_epochs': 15,
